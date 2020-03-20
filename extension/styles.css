@@ -1,6 +1,14 @@
-.handsup-btn {
-  height: 82px;
-  width: 82px;
+.nod-appWrapper {
+  display: flex;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000000;
+}
+
+.nod-btn {
+  height: 64px;
+  width: 64px;
   background-color: rgba(255, 255, 255, 0.9);
   -webkit-user-select: none;
   transition: all 0.3s;
@@ -15,21 +23,64 @@
   align-items: center;
   font-size: 36px;
   box-shadow: rgba(0, 0, 0, 0.15) 1px 2px 10px;
+  padding: 10px;
+  margin-right: 5px;
+  margin-bottom: 5px;
 }
 
-.handsup-btn:hover {
+.nod-btn.small {
+  height: 40px;
+  width: 40px;
+}
+
+.nod-tray {
+  display: flex;
+  animation-name: fade;
+  animation-duration: 1s;
+  align-items: center;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.nod-btn:hover {
   background-color: white;
   transform: scale(1.05) rotate(-10deg);
 }
 
-.handsup-avatar {
+.nod-avatar {
   border-radius: 50%;
   height: 40px;
   width: 40px;
   margin-right: 10px;
 }
 
-.handsup-message {
+.nod-emoji-wrapper {
+  border-radius: 50%;
+  height: 40px;
+  width: 40px;
+  margin-right: -20px;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  z-index: 2;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 10px;
+}
+
+.nod-emoji {
+  width: 100%;
+  max-width: 50px;
+}
+
+.nod-message {
   background-color: white;
   border-radius: 30px;
   display: flex;
