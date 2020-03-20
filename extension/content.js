@@ -1,8 +1,10 @@
 chrome.runtime.onMessage.addListener(request => {
   if (request.message === "init_action") {
-    //
-    // Sudo Imports?
-    //
+    let avatar;
+    let name;
+    let username;
+    let meetingId;
+    let wsClient;
 
     const createTray = () => {
       const thumbsup = createBtn("img/thumb.png");
@@ -53,7 +55,7 @@ chrome.runtime.onMessage.addListener(request => {
       btn.addEventListener(
         "click",
         debounce(() => {
-          wsClient.send(JSON.stringify({ id: request.id, emoji: emoji, message: username, img: avatar.src }));
+          wsClient.send(JSON.stringify({ id: meetingId, emoji: emoji, message: username, img: avatar.src }));
         }, 400)
       );
       return btn;
@@ -100,30 +102,36 @@ chrome.runtime.onMessage.addListener(request => {
 
     // Variables
 
-    const wsClient = new WebSocket("wss://ma711m87kd.execute-api.us-east-1.amazonaws.com/dev/");
+    avatar = getElementByXpath('//*[@id="yDmH0d"]/c-wiz/div/div/div[3]/div[3]/div/div[1]/div[2]/div/img');
+    name = getElementByXpath('//*[@id="yDmH0d"]/c-wiz/div/div/div[3]/div[3]/div/div[1]/div[2]/div/div/div');
+    username = name["title"].split(" ")[0];
+    meetingId = document.querySelector("[data-unresolved-meeting-id]").getAttribute("data-unresolved-meeting-id");
 
-    const avatar = getElementByXpath('//*[@id="yDmH0d"]/c-wiz/div/div/div[3]/div[3]/div/div[1]/div[2]/div/img');
-    const name = getElementByXpath('//*[@id="yDmH0d"]/c-wiz/div/div/div[3]/div[3]/div/div[1]/div[2]/div/div/div');
-    const username = name["title"].split(" ")[0];
+    const loading = setInterval(() => {
+      const loadingText = getElementByXpath('//*[@id="yDmH0d"]/c-wiz/div/div/div[3]/div[3]/div/div[2]/div/div[2]/div/div[1]/div[1]/div[1]/div');
 
-    const appWrapper = createTray();
-    const messageWrapper = createMessageWrapper();
-    // Main
+      if (loadingText === null) {
+        clearInterval(loading);
+        wsClient = new WebSocket("wss://ma711m87kd.execute-api.us-east-1.amazonaws.com/dev/");
+        const appWrapper = createTray();
+        const messageWrapper = createMessageWrapper();
 
-    wsClient.addEventListener("open", () => {
-      document.body.appendChild(appWrapper);
-      document.body.appendChild(messageWrapper);
-      wsClient.send(JSON.stringify({ route: "join", data: { id: request.id } }));
-    });
+        wsClient.addEventListener("message", event => {
+          messageWrapper.insertAdjacentElement("afterbegin", createMessage(event.data));
+          setTimeout(() => {
+            messageWrapper.lastChild.style = "opacity: 0";
+            setTimeout(() => {
+              messageWrapper.removeChild(messageWrapper.lastChild);
+            }, 300);
+          }, 5000);
+        });
 
-    wsClient.addEventListener("message", event => {
-      messageWrapper.insertAdjacentElement("afterbegin", createMessage(event.data));
-      setTimeout(() => {
-        messageWrapper.lastChild.style = "opacity: 0";
-        setTimeout(() => {
-          messageWrapper.removeChild(messageWrapper.lastChild);
-        }, 300);
-      }, 5000);
-    });
+        document.body.appendChild(appWrapper);
+        document.body.appendChild(messageWrapper);
+        wsClient.addEventListener("open", event => {
+          wsClient.send(JSON.stringify({ route: "join", data: { id: meetingId } }));
+        });
+      }
+    }, 1000);
   }
 });
