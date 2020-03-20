@@ -12,9 +12,9 @@ chrome.runtime.onMessage.addListener(request => {
     document.body.appendChild(messageWrapper);
 
     wsClient.addEventListener("open", () => {
-      const button = createBtn(wsClient, request.url, username, avatar.src);
+      const button = createBtn(wsClient, request.id, username, avatar.src);
       appWrapper.append(button);
-      wsClient.send(JSON.stringify({ route: "join", data: { id: request.url } }));
+      wsClient.send(JSON.stringify({ route: "join", data: { id: request.id } }));
     });
 
     wsClient.addEventListener("message", event => {
@@ -41,13 +41,16 @@ const createMessageWrapper = () => {
   return wrapper;
 };
 
-const createBtn = (wsClient, url, name, img) => {
+const createBtn = (wsClient, id, name, img) => {
   var btn = document.createElement("DIV");
   btn.classList.add("handsup-btn");
   btn.innerHTML = "👍️";
-  btn.addEventListener("click", () => {
-    wsClient.send(JSON.stringify({ id: url, message: name, img: img }));
-  });
+  btn.addEventListener(
+    "click",
+    debounce(args => {
+      wsClient.send(JSON.stringify({ id: id, message: name, img: img }));
+    }, 300)
+  );
   return btn;
 };
 
@@ -69,3 +72,13 @@ const createMessage = message => {
 function getElementByXpath(path) {
   return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 }
+
+const debounce = (func, delay) => {
+  let inDebounce;
+  return function() {
+    const context = this;
+    const args = arguments;
+    clearTimeout(inDebounce);
+    inDebounce = setTimeout(() => func.apply(context, args), delay);
+  };
+};

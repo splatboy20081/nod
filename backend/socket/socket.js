@@ -3,10 +3,6 @@ AWS.config.update({ region: process.env.AWS_REGION });
 const DDB = new AWS.DynamoDB({ apiVersion: "2012-10-08" });
 const DDBDoc = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" });
 
-on("connect", async (data, socket) => {
-  socket.send(JSON.stringify({ status: "connected" }));
-});
-
 on("join", async (data, socket) => {
   let result;
   var params = {
@@ -33,6 +29,7 @@ on("disconnect", async (data, socket) => {
   };
   try {
     result = await DDB.deleteItem(params).promise();
+    cancelKeepAlive(timerID);
   } catch (error) {
     throw new Error(error);
   }
