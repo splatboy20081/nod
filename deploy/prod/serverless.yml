@@ -1,13 +1,11 @@
 connectionTable:
   component: "@serverless/aws-dynamodb"
   inputs:
-    name: handsup-connectiontable
+    name: nod-prod-connections
     attributeDefinitions:
       - AttributeName: connectionId
         AttributeType: S
       - AttributeName: meetingId
-        AttributeType: S
-      - AttributeName: name
         AttributeType: S
     keySchema:
       - AttributeName: connectionId
@@ -19,7 +17,8 @@ connectionTable:
 websocketApi:
   component: "@serverless/backend-socket"
   inputs:
-    name: handsup-websocket
+    name: nod-websocket
+    stage: prod
     description: HandsUp websocket backend
     region: us-east-1
     memory: 128
@@ -27,4 +26,4 @@ websocketApi:
     env:
       connectionDb: ${connectionTable.name}
     code:
-      src: ./backend/socket
+      src: ../../backend/socket

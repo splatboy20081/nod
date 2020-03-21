@@ -1,0 +1,20 @@
+{
+  "name": "nod",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "deploy-dev": "cd deploy/dev && serverless",
+    "deploy-prod": "cd deploy/prod && serverless"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jamieecarr/nod.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jamieecarr/nod/issues"
+  },
+  "homepage": "https://github.com/jamieecarr/nod#readme"
+}
