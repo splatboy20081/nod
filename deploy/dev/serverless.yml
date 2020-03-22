@@ -18,8 +18,8 @@ websocketApi:
   component: "@serverless/backend-socket"
   inputs:
     name: nod-websocket
-    deploymentStage: ${opt:stage, 'dev'}
-    description: HandsUp websocket backend
+    stage: dev
+    description: Nod-Dev Websocket Backend
     region: us-east-1
     memory: 128
     timeout: 10

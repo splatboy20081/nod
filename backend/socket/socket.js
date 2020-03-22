@@ -4,7 +4,6 @@ const DDB = new AWS.DynamoDB({ apiVersion: "2012-10-08" });
 const DDBDoc = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" });
 
 on("join", async (data, socket) => {
-  let result;
   var params = {
     TableName: process.env.connectionDb,
     Item: {
@@ -13,48 +12,47 @@ on("join", async (data, socket) => {
     }
   };
   try {
-    result = await DDB.putItem(params).promise();
+    await DDB.putItem(params).promise();
   } catch (error) {
     throw new Error(error);
   }
 });
 
 on("disconnect", async (data, socket) => {
-  let result;
   var params = {
     TableName: process.env.connectionDb,
     Key: {
-      connectionId: { S: socket.id }
+      connectionId: { S: socket.id },
+      meetingId: { S: data.id }
     }
   };
   try {
-    result = await DDB.deleteItem(params).promise();
-    cancelKeepAlive(timerID);
+    await DDB.deleteItem(params).promise();
   } catch (error) {
     throw new Error(error);
   }
+});
 
-  await socket.send({ status: "disconnected" });
+on("ping", async (data, socket) => {
+  await socket.send(JSON.stringify({ action: "PING" }), socket.id);
 });
 
 on("default", async (data, socket) => {
-  let connectionData;
   const parsedData = JSON.parse(data);
-  const id = parsedData.id;
-
   try {
-    connectionData = await DDBDoc.scan({
+    let connectionData = await DDBDoc.scan({
       TableName: process.env.connectionDb,
       ProjectionExpression: "connectionId",
-      FilterExpression: "meetingId = :id",
+      FilterExpression: "meetingId = :meetingId and connectionId <> :userId",
       ExpressionAttributeValues: {
-        ":id": id
+        ":meetingId": parsedData.message.id,
+        ":userId": socket.id
       }
     }).promise();
+    connectionData.Items.map(async ({ connectionId }) => {
+      await socket.send(data, connectionId);
+    });
   } catch (error) {
     throw new Error(error);
   }
-  connectionData.Items.map(async ({ connectionId }) => {
-    await socket.send(data, connectionId);
-  });
 });

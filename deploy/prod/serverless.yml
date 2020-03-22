@@ -17,9 +17,9 @@ connectionTable:
 websocketApi:
   component: "@serverless/backend-socket"
   inputs:
-    name: nod-websocket
+    name: nod-prod-websocket
     stage: prod
-    description: HandsUp websocket backend
+    description: Nod-Prod Websocket Backend
     region: us-east-1
     memory: 128
     timeout: 10
