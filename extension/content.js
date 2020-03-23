@@ -39,7 +39,7 @@ chrome.runtime.onMessage.addListener(request => {
           const messageData = { action: "MESSAGE", message: data };
           insertMessage(messageData, messageWrapper);
           wsClient.send(JSON.stringify(messageData));
-        }, 400)
+        }, 500)
       );
       return btn;
     };
@@ -126,22 +126,18 @@ chrome.runtime.onMessage.addListener(request => {
     // Initialize
     //
 
-    const loading = setInterval(() => {
-      const loadingText = getElementByXpath('//*[@id="yDmH0d"]/c-wiz/div/div/div[3]/div[3]/div/div[2]/div/div[2]/div/div[1]/div[1]/div[1]/div');
-      if (!loadingText) {
-        clearInterval(loading);
-        init();
+    const init = async () => {
+      while (getElementByXpath('//*[@id="yDmH0d"]/c-wiz/div/div/div[3]/div[3]/div/div[2]/div/div[2]/div/div[1]/div[1]/div[1]/div')) {
+        await new Promise(r => setTimeout(r, 500));
       }
-    }, 1000);
 
-    const init = () => {
       const wsUrl = IS_DEV_MODE ? "wss://ocbtgdge06.execute-api.us-east-1.amazonaws.com/dev/" : "wss://bc74w5xpwb.execute-api.us-east-1.amazonaws.com/prod/";
       wsClient = new WebSocket(wsUrl);
 
       wsClient.addEventListener("open", () => {
         document.body.appendChild(appWrapper);
         document.body.appendChild(messageWrapper);
-        wsClient.send(JSON.stringify({ route: "join", data: { id: meetingId } }));
+        wsClient.send(JSON.stringify({ route: "join", data: { id: meetingId, username: username } }));
 
         wsClient.addEventListener("message", event => {
           const data = JSON.parse(event.data);
@@ -164,5 +160,7 @@ chrome.runtime.onMessage.addListener(request => {
         ping();
       });
     };
+
+    init();
   }
 });

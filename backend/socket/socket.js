@@ -4,11 +4,13 @@ const DDB = new AWS.DynamoDB({ apiVersion: "2012-10-08" });
 const DDBDoc = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" });
 
 on("join", async (data, socket) => {
+  const username = data.username ? data.username : "none";
   var params = {
     TableName: process.env.connectionDb,
     Item: {
       connectionId: { S: socket.id },
-      meetingId: { S: data.id }
+      meetingId: { S: data.id },
+      username: { S: username }
     }
   };
   try {
