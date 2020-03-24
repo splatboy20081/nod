@@ -10,7 +10,8 @@ on("join", async (data, socket) => {
     Item: {
       connectionId: { S: socket.id },
       meetingId: { S: data.id },
-      username: { S: username }
+      username: { S: username },
+      connectedAt: { S: new Date().toISOString().match(/(\d{2}:){2}\d{2}/)[0] }
     }
   };
   try {

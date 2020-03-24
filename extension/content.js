@@ -19,7 +19,8 @@ chrome.runtime.onMessage.addListener(request => {
 
     let messageWrapper = createMessageWrapper();
 
-    const createBtn = (emojiPath, small) => {
+    const createBtn = (emojiPath, small, tip) => {
+      const btnWrapper = document.createElement("DIV");
       const btn = document.createElement("DIV");
       const img = document.createElement("IMG");
       const emoji = chrome.runtime.getURL(emojiPath);
@@ -30,18 +31,79 @@ chrome.runtime.onMessage.addListener(request => {
       btn.classList.add("nod-btn");
       small && btn.classList.add("small");
       btn.appendChild(img);
+      btnWrapper.classList.add("nod-btn-wrapper");
+      btnWrapper.appendChild(btn);
 
-      const data = { id: meetingId, emoji: emoji, username: username, img: avatar.src };
+      if (tip) {
+        let tooltip = createTooltip(tip);
+
+        btn.addEventListener("mouseenter", () => {
+          btnWrapper.appendChild(tooltip);
+        });
+
+        btn.addEventListener("mouseleave", () => {
+          btnWrapper.removeChild(tooltip);
+        });
+      }
 
       btn.addEventListener(
         "click",
         debounce(() => {
-          const messageData = { action: "MESSAGE", message: data };
+          const messageData = {
+            action: "MESSAGE",
+            message: { id: meetingId, emoji: emoji, username: username, img: avatar.src }
+          };
           insertMessage(messageData, messageWrapper);
           wsClient.send(JSON.stringify(messageData));
         }, 500)
       );
-      return btn;
+      return btnWrapper;
+    };
+
+    const createHandUpBtn = (emojiPath, tip) => {
+      const btnWrapper = document.createElement("DIV");
+      const btnBlock = document.createElement("DIV");
+      const btn = document.createElement("DIV");
+      const img = document.createElement("IMG");
+      const emoji = chrome.runtime.getURL(emojiPath);
+
+      img.setAttribute("src", emoji);
+      img.classList.add("nod-emoji");
+
+      btn.classList.add("nod-btn");
+      btn.classList.add("small");
+      btn.appendChild(img);
+
+      btnBlock.classList.add("nod-btn-wrapper");
+      btnWrapper.classList.add("nod-handsup-wrapper");
+
+      btnBlock.appendChild(btn);
+      btnWrapper.appendChild(btnBlock);
+
+      if (tip) {
+        let tooltip = createTooltip(tip);
+
+        btnBlock.addEventListener("mouseenter", () => {
+          btnBlock.appendChild(tooltip);
+        });
+
+        btnBlock.addEventListener("mouseleave", () => {
+          btnBlock.removeChild(tooltip);
+        });
+      }
+
+      btn.addEventListener(
+        "click",
+        debounce(() => {
+          const messageData = {
+            action: "QUEUE",
+            message: { id: meetingId, emoji: emoji, username: `${username} raised their hand`, img: avatar.src, messageId: generateUUID() }
+          };
+          addToQueue(messageData, messageWrapper);
+          wsClient.send(JSON.stringify(messageData));
+        }, 500)
+      );
+      return btnWrapper;
     };
 
     const createTray = () => {
@@ -54,10 +116,18 @@ chrome.runtime.onMessage.addListener(request => {
       subTray.classList.add("nod-tray");
       tray.append(thumb);
 
-      ["love", "wave", "laugh", "clap"].forEach(e => {
-        let btn = createBtn(`img/${e}.gif`, true);
+      [
+        ["love", "Love&nbsp;it!"],
+        ["confused", "I'm&nbsp;Confused?"],
+        ["laugh", "LOL"],
+        ["clap", "Well&nbsp;Done!"]
+      ].forEach(e => {
+        let btn = createBtn(`img/${e[0]}.gif`, true, e[1]);
         subTray.append(btn);
       });
+
+      let btn = createHandUpBtn("img/hand.gif", "Raise&nbsp;your&nbsp;hand");
+      subTray.append(btn);
 
       tray.addEventListener("mouseenter", () => {
         tray.appendChild(subTray);
@@ -112,14 +182,50 @@ chrome.runtime.onMessage.addListener(request => {
       };
     }
 
+    function generateUUID() {
+      return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
+        var r = (Math.random() * 16) | 0,
+          v = c == "x" ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+      });
+    }
+
     function insertMessage(data, container) {
-      container.insertAdjacentElement("afterbegin", createMessage(data));
+      const item = container.insertAdjacentElement("afterbegin", createMessage(data));
       setTimeout(() => {
-        container.lastChild.classList.add("nod-removed");
+        item.classList.add("nod-removed");
         setTimeout(() => {
-          container.removeChild(container.lastChild);
+          item.remove();
         }, 300);
       }, 5000);
+    }
+
+    function addToQueue(data, container) {
+      const item = container.insertAdjacentElement("afterbegin", createMessage(data));
+      const id = data.message.messageId;
+      item.setAttribute("data-id", id);
+
+      item.addEventListener("click", () => {
+        wsClient.send(JSON.stringify({ action: "REMOVE", message: { id: meetingId, messageId: id } }));
+        removeFromQueue(id, container);
+      });
+    }
+
+    function removeFromQueue(id) {
+      const removableItem = messageWrapper.querySelector(`[data-id='${id}']`);
+      if (removableItem) {
+        removableItem.classList.add("nod-removed");
+        setTimeout(() => {
+          removableItem.remove();
+        }, 300);
+      }
+    }
+
+    function createTooltip(text) {
+      const wrapper = document.createElement("DIV");
+      wrapper.classList.add("nod-tooltip");
+      wrapper.innerHTML += text;
+      return wrapper;
     }
 
     //
@@ -135,16 +241,24 @@ chrome.runtime.onMessage.addListener(request => {
       wsClient = new WebSocket(wsUrl);
 
       wsClient.addEventListener("open", () => {
+        console.log("opening");
         document.body.appendChild(appWrapper);
         document.body.appendChild(messageWrapper);
         wsClient.send(JSON.stringify({ route: "join", data: { id: meetingId, username: username } }));
 
         wsClient.addEventListener("message", event => {
           const data = JSON.parse(event.data);
-          if (data.action == "MESSAGE") {
-            insertMessage(data, messageWrapper);
-          } else {
-            console.log(data);
+          console.log(data.action);
+          switch (data.action) {
+            case "MESSAGE":
+              insertMessage(data, messageWrapper);
+              break;
+            case "QUEUE":
+              addToQueue(data, messageWrapper);
+              break;
+            case "REMOVE":
+              removeFromQueue(data.message.messageId);
+              break;
           }
         });
 

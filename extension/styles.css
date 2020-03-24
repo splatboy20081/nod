@@ -10,6 +10,9 @@
   bottom: 100px;
   left: 20px;
   z-index: 100000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .nod-btn {
@@ -48,6 +51,35 @@
   opacity: 1;
 }
 
+.nod-tooltip {
+  background-color: white;
+  color: black;
+  padding: 3px 10px;
+  position: absolute;
+  left: 45%;
+  bottom: -35px;
+  border-radius: 5px;
+  transform: translate(-50%);
+  width: auto;
+  animation-name: fade;
+  animation-duration: 1s;
+}
+
+.nod-tooltip:after {
+  content: "";
+  position: absolute;
+  background-color: white;
+  top: -5px;
+  left: 45%;
+  transform: translate(-50%);
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 3px;
+  transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+}
+
 .nod-tray {
   display: flex;
   animation-name: fade;
@@ -62,6 +94,15 @@
   to {
     opacity: 1;
   }
+}
+.nod-btn-wrapper {
+  position: relative;
+}
+
+.nod-handsup-wrapper {
+  padding-left: 15px;
+  margin-left: 15px;
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .nod-avatar {
@@ -83,11 +124,17 @@
   font-size: 24px;
   z-index: 2;
   box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 10px;
+  overflow: hidden;
 }
 
 .nod-emoji {
-  width: 90%;
+  width: 80%;
   max-width: 50px;
+}
+
+.nod-handsup-emoji {
+  margin-top: 10px;
+  magin-left: 10px;
 }
 
 .nod-message {
@@ -103,6 +150,7 @@
   font-size: 16px;
   transition: all 0.3s ease-in-out;
   overflow: hidden;
+  flex-shrink: 1;
 }
 
 .nod-removed {
