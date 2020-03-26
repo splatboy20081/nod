@@ -4,9 +4,14 @@ chrome.runtime.onMessage.addListener(request => {
   if (request.message === "init") {
     let wsClient;
 
-    let avatar = getElementByXpath('//*[@id="yDmH0d"]/c-wiz/div/div/div[3]/div[3]/div/div[1]/div[2]/div/img');
-    let name = getElementByXpath('//*[@id="yDmH0d"]/c-wiz/div/div/div[3]/div[3]/div/div[1]/div[2]/div/div/div');
-    let username = name && name["title"].split(" ")[0];
+    const userData = contains("script", "ds:7");
+    const userDataString = userData[1].text.match(/\[[^\}]*/)[0];
+    const userArr = userDataString.split(",");
+    const name = userArr[6].slice(1, -1);
+
+    let avatar = document.querySelector(".qg7mD");
+    let username = name.split(" ")[0];
+    let team = userArr[28].slice(1, -1);
     let meetingId = document.querySelector("[data-unresolved-meeting-id]").getAttribute("data-unresolved-meeting-id");
 
     // Create Functions
@@ -168,8 +173,11 @@ chrome.runtime.onMessage.addListener(request => {
 
     // Util functions
 
-    function getElementByXpath(path) {
-      return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+    function contains(selector, text) {
+      var elements = document.querySelectorAll(selector);
+      return [].filter.call(elements, function(element) {
+        return RegExp(text).test(element.textContent);
+      });
     }
 
     function debounce(func, delay) {
@@ -204,6 +212,17 @@ chrome.runtime.onMessage.addListener(request => {
       const item = container.insertAdjacentElement("afterbegin", createMessage(data));
       const id = data.message.messageId;
       item.setAttribute("data-id", id);
+      item.classList.add("nod-removable");
+
+      item.addEventListener("mouseenter", () => {
+        let emoji = item.querySelector(".nod-emoji");
+        emoji.setAttribute("src", chrome.runtime.getURL("img/down.png"));
+      });
+
+      item.addEventListener("mouseleave", () => {
+        let emoji = item.querySelector(".nod-emoji");
+        emoji.setAttribute("src", chrome.runtime.getURL("img/hand.gif"));
+      });
 
       item.addEventListener("click", () => {
         wsClient.send(JSON.stringify({ action: "REMOVE", message: { id: meetingId, messageId: id } }));
@@ -233,7 +252,7 @@ chrome.runtime.onMessage.addListener(request => {
     //
 
     const init = async () => {
-      while (getElementByXpath('//*[@id="yDmH0d"]/c-wiz/div/div/div[3]/div[3]/div/div[2]/div/div[2]/div/div[1]/div[1]/div[1]/div')) {
+      while (document.querySelector(".d7iDfe") !== null) {
         await new Promise(r => setTimeout(r, 500));
       }
 
@@ -241,14 +260,12 @@ chrome.runtime.onMessage.addListener(request => {
       wsClient = new WebSocket(wsUrl);
 
       wsClient.addEventListener("open", () => {
-        console.log("opening");
         document.body.appendChild(appWrapper);
         document.body.appendChild(messageWrapper);
-        wsClient.send(JSON.stringify({ route: "join", data: { id: meetingId, username: username } }));
+        wsClient.send(JSON.stringify({ route: "join", data: { id: meetingId, username: username, team: team } }));
 
         wsClient.addEventListener("message", event => {
           const data = JSON.parse(event.data);
-          console.log(data.action);
           switch (data.action) {
             case "MESSAGE":
               insertMessage(data, messageWrapper);
@@ -262,10 +279,6 @@ chrome.runtime.onMessage.addListener(request => {
           }
         });
 
-        window.addEventListener("beforeunload", function(e) {
-          wsClient.send(JSON.stringify({ route: "disconnect", data: { id: meetingId } }));
-        });
-
         const ping = () => {
           wsClient.send(JSON.stringify({ route: "ping" }));
           setTimeout(ping, 500000);
@@ -275,6 +288,10 @@ chrome.runtime.onMessage.addListener(request => {
       });
     };
 
-    init();
+    debounce(init(), 5000);
+
+    window.addEventListener("beforeunload", async e => {
+      await wsClient.send(JSON.stringify({ route: "disconnect", data: { id: meetingId } }));
+    });
   }
 });

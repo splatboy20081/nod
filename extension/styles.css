@@ -153,6 +153,10 @@
   flex-shrink: 1;
 }
 
+.nod-removable {
+  cursor: pointer;
+}
+
 .nod-removed {
   opacity: 0;
   margin-bottom: -50px;
