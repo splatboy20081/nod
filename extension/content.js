@@ -1,18 +1,27 @@
-chrome.runtime.onMessage.addListener(request => {
-  const IS_DEV_MODE = !("update_url" in chrome.runtime.getManifest());
+(async () => {
+  const IS_DEV_MODE = true;
 
-  if (request.message === "init") {
-    let wsClient;
+  let wsClient;
+  let meetingId;
 
-    const userData = contains("script", "ds:7");
-    const userDataString = userData[1].text.match(/\[[^\}]*/)[0];
-    const userArr = userDataString.split(",");
-    const name = userArr[6].slice(1, -1);
+  function contains(selector, text) {
+    var elements = document.querySelectorAll(selector);
+    return [].filter.call(elements, function(element) {
+      return RegExp(text).test(element.textContent);
+    });
+  }
 
-    let avatar = document.querySelector(".qg7mD");
+  meetingId = document.querySelector("[data-unresolved-meeting-id]").getAttribute("data-unresolved-meeting-id");
+
+  const dataScript = contains("script", "ds:7");
+  const assets = JSON.parse(document.querySelector("#nodAssetData").innerHTML);
+  const userData = JSON.parse(dataScript[1].text.match(/\[[^\}]*/)[0]);
+  const name = userData[6];
+
+  if (name != null) {
+    let avatar = userData[5];
     let username = name.split(" ")[0];
-    let team = userArr[28].slice(1, -1);
-    let meetingId = document.querySelector("[data-unresolved-meeting-id]").getAttribute("data-unresolved-meeting-id");
+    let team = userData[28];
 
     // Create Functions
 
@@ -24,11 +33,11 @@ chrome.runtime.onMessage.addListener(request => {
 
     let messageWrapper = createMessageWrapper();
 
-    const createBtn = (emojiPath, small, tip) => {
+    const createBtn = (emojiName, small, tip) => {
       const btnWrapper = document.createElement("DIV");
       const btn = document.createElement("DIV");
       const img = document.createElement("IMG");
-      const emoji = chrome.runtime.getURL(emojiPath);
+      const emoji = assets[emojiName];
 
       img.setAttribute("src", emoji);
       img.classList.add("nod-emoji");
@@ -56,7 +65,7 @@ chrome.runtime.onMessage.addListener(request => {
         debounce(() => {
           const messageData = {
             action: "MESSAGE",
-            message: { id: meetingId, emoji: emoji, username: username, img: avatar.src }
+            message: { id: meetingId, emoji: emoji, username: username, img: avatar }
           };
           insertMessage(messageData, messageWrapper);
           wsClient.send(JSON.stringify(messageData));
@@ -65,12 +74,12 @@ chrome.runtime.onMessage.addListener(request => {
       return btnWrapper;
     };
 
-    const createHandUpBtn = (emojiPath, tip) => {
+    const createHandUpBtn = (emojiName, tip) => {
       const btnWrapper = document.createElement("DIV");
       const btnBlock = document.createElement("DIV");
       const btn = document.createElement("DIV");
       const img = document.createElement("IMG");
-      const emoji = chrome.runtime.getURL(emojiPath);
+      const emoji = assets[emojiName];
 
       img.setAttribute("src", emoji);
       img.classList.add("nod-emoji");
@@ -102,7 +111,7 @@ chrome.runtime.onMessage.addListener(request => {
         debounce(() => {
           const messageData = {
             action: "QUEUE",
-            message: { id: meetingId, emoji: emoji, username: `${username} raised their hand`, img: avatar.src, messageId: generateUUID() }
+            message: { id: meetingId, emoji: emoji, username: `${username} raised their hand`, img: avatar, messageId: generateUUID() }
           };
           addToQueue(messageData, messageWrapper);
           wsClient.send(JSON.stringify(messageData));
@@ -114,7 +123,7 @@ chrome.runtime.onMessage.addListener(request => {
     const createTray = () => {
       const tray = document.createElement("DIV");
       const subTray = document.createElement("DIV");
-      const thumb = createBtn("img/thumb.png");
+      const thumb = createBtn("thumb");
 
       tray.classList.add("nod-appWrapper");
       tray.classList.add("nod-tray");
@@ -127,11 +136,11 @@ chrome.runtime.onMessage.addListener(request => {
         ["laugh", "LOL"],
         ["clap", "Well&nbsp;Done!"]
       ].forEach(e => {
-        let btn = createBtn(`img/${e[0]}.gif`, true, e[1]);
+        let btn = createBtn(e[0], true, e[1]);
         subTray.append(btn);
       });
 
-      let btn = createHandUpBtn("img/hand.gif", "Raise&nbsp;your&nbsp;hand");
+      let btn = createHandUpBtn("hand", "Raise&nbsp;your&nbsp;hand");
       subTray.append(btn);
 
       tray.addEventListener("mouseenter", () => {
@@ -173,13 +182,6 @@ chrome.runtime.onMessage.addListener(request => {
 
     // Util functions
 
-    function contains(selector, text) {
-      var elements = document.querySelectorAll(selector);
-      return [].filter.call(elements, function(element) {
-        return RegExp(text).test(element.textContent);
-      });
-    }
-
     function debounce(func, delay) {
       let inDebounce;
       return function() {
@@ -211,17 +213,20 @@ chrome.runtime.onMessage.addListener(request => {
     function addToQueue(data, container) {
       const item = container.insertAdjacentElement("afterbegin", createMessage(data));
       const id = data.message.messageId;
+      const hand = assets["hand"];
+      const close = assets["down"];
+
       item.setAttribute("data-id", id);
       item.classList.add("nod-removable");
 
       item.addEventListener("mouseenter", () => {
         let emoji = item.querySelector(".nod-emoji");
-        emoji.setAttribute("src", chrome.runtime.getURL("img/down.png"));
+        emoji.setAttribute("src", close);
       });
 
       item.addEventListener("mouseleave", () => {
         let emoji = item.querySelector(".nod-emoji");
-        emoji.setAttribute("src", chrome.runtime.getURL("img/hand.gif"));
+        emoji.setAttribute("src", hand);
       });
 
       item.addEventListener("click", () => {
@@ -256,13 +261,15 @@ chrome.runtime.onMessage.addListener(request => {
         await new Promise(r => setTimeout(r, 500));
       }
 
-      const wsUrl = IS_DEV_MODE ? "wss://ocbtgdge06.execute-api.us-east-1.amazonaws.com/dev/" : "wss://bc74w5xpwb.execute-api.us-east-1.amazonaws.com/prod/";
+      const wsUrl = IS_DEV_MODE ? "wss://ypuphzsg9c.execute-api.us-east-1.amazonaws.com/dev/" : "wss://6qp9an2k9b.execute-api.us-east-1.amazonaws.com/prod/";
       wsClient = new WebSocket(wsUrl);
 
       wsClient.addEventListener("open", () => {
         document.body.appendChild(appWrapper);
         document.body.appendChild(messageWrapper);
-        wsClient.send(JSON.stringify({ route: "join", data: { id: meetingId, username: username, team: team } }));
+        wsClient.send(JSON.stringify({ route: "join", data: { id: meetingId, team: team } }));
+        console.log("%c Initialised Nod Extension.", "background: #4D2F3C; color: #FBE2A0");
+        console.log("%c Something gone wrong? Let me know - hi@jamiec.io", "background: #4D2F3C; color: #FBE2A0");
 
         wsClient.addEventListener("message", event => {
           const data = JSON.parse(event.data);
@@ -281,17 +288,19 @@ chrome.runtime.onMessage.addListener(request => {
 
         const ping = () => {
           wsClient.send(JSON.stringify({ route: "ping" }));
-          setTimeout(ping, 500000);
+          setTimeout(ping, 60000);
         };
 
         ping();
       });
     };
 
-    debounce(init(), 5000);
+    init();
 
     window.addEventListener("beforeunload", async e => {
       await wsClient.send(JSON.stringify({ route: "disconnect", data: { id: meetingId } }));
     });
+
+    window.onerror = function(errorMsg, url, lineNumber) {};
   }
-});
+})();

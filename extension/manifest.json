@@ -1,22 +1,20 @@
 {
   "manifest_version": 2,
   "name": "Nod - Reactions for Google Meet",
-  "version": "1.6.1",
+  "version": "2.0",
   "description": "Nod along with quick reactions for muted team members",
   "content_scripts": [
     {
       "matches": ["*://meet.google.com/**-**-**"],
-      "js": ["content.js"],
-      "css": ["styles.css"]
+      "js": ["inject.js"]
     }
   ],
-  "web_accessible_resources": ["img/down.png", "img/hand.gif", "img/confused.gif", "img/clap.gif", "img/laugh.gif", "img/love.gif", "img/thumb.png"],
+  "web_accessible_resources": ["content.js", "styles.css", "img/*"],
   "icons": { "16": "icons/16.png", "48": "icons/48.png", "128": "icons/128.png" },
   "background": {
     "scripts": ["background.js"]
   },
   "browser_action": {
     "default_icon": "icons/16.png"
-  },
-  "permissions": ["tabs"]
+  }
 }

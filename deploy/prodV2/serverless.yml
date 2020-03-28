@@ -1,7 +1,7 @@
 connectionTable:
   component: "@serverless/aws-dynamodb"
   inputs:
-    name: nod-connections-dev
+    name: nod-connections-prod-v2
     attributeDefinitions:
       - AttributeName: connectionID
         AttributeType: S
@@ -26,7 +26,7 @@ connectionTable:
 teamsTable:
   component: "@serverless/aws-dynamodb"
   inputs:
-    name: nod-teams-dev-v2
+    name: nod-teams-prod-v2
     attributeDefinitions:
       - AttributeName: teamName
         AttributeType: S
@@ -38,9 +38,9 @@ teamsTable:
 websocketApi:
   component: "@serverless/backend-socket"
   inputs:
-    name: nod-websocket
-    stage: dev
-    description: Nod-Dev Websocket Backend
+    name: nod-prod-websocket-v2
+    stage: prod
+    description: Nod-Prod Websocket Backend v2
     region: us-east-1
     memory: 128
     timeout: 10
