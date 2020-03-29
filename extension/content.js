@@ -3,6 +3,7 @@
 
   let wsClient;
   let meetingId;
+  let keepAlive;
 
   function contains(selector, text) {
     var elements = document.querySelectorAll(selector);
@@ -273,6 +274,10 @@
 
         wsClient.addEventListener("message", event => {
           const data = JSON.parse(event.data);
+          if (data.action != "PING") {
+            clearInterval(keepAlive);
+            keepAlive = setInterval(ping, 600000 * 9);
+          }
           switch (data.action) {
             case "MESSAGE":
               insertMessage(data, messageWrapper);
@@ -288,19 +293,12 @@
 
         const ping = () => {
           wsClient.send(JSON.stringify({ route: "ping" }));
-          setTimeout(ping, 60000);
         };
 
-        ping();
+        keepAlive = setInterval(ping, 600000 * 9);
       });
     };
 
     init();
-
-    window.addEventListener("beforeunload", async e => {
-      await wsClient.send(JSON.stringify({ route: "disconnect", data: { id: meetingId } }));
-    });
-
-    window.onerror = function(errorMsg, url, lineNumber) {};
   }
 })();
