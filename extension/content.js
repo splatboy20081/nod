@@ -1,5 +1,7 @@
 (async () => {
-  const IS_DEV_MODE = true;
+  // REMEMBER TO TURN THIS BACK OFF YOU TIT.
+  const IS_DEV_MODE = false;
+  // YES. THIS IS AWFUL CODE. BUT DONT FORGET.
 
   let wsClient;
   let meetingId;
@@ -276,7 +278,7 @@
           const data = JSON.parse(event.data);
           if (data.action != "PING") {
             clearInterval(keepAlive);
-            keepAlive = setInterval(ping, 600000 * 9);
+            keepAlive = setInterval(ping, 60000 * 5);
           }
           switch (data.action) {
             case "MESSAGE":
@@ -292,13 +294,15 @@
         });
 
         const ping = () => {
+          console.log("Keeping Nod alive...");
           wsClient.send(JSON.stringify({ route: "ping" }));
         };
 
-        keepAlive = setInterval(ping, 600000 * 9);
+        keepAlive = setInterval(ping, 60000 * 5);
       });
     };
 
     init();
   }
+  window.onerror = function(message, source, lineno, colno, error) {};
 })();
