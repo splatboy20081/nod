@@ -40,7 +40,7 @@ injectScript(
       "laugh" : "${chrome.runtime.getURL("img/laugh.gif")}",
       "love" : "${chrome.runtime.getURL("img/love.gif")}",
       "hand" : "${chrome.runtime.getURL("img/hand.gif")}",
-      "down" : "${chrome.runtime.getURL("img/down.png")}"
-
+      "down" : "${chrome.runtime.getURL("img/down.png")}",
+      "handStatic" : "${chrome.runtime.getURL("img/hand.png")}"
     }`
 );

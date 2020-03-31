@@ -3,9 +3,14 @@
   const IS_DEV_MODE = false;
   // YES. THIS IS AWFUL CODE. BUT DONT FORGET.
 
+  window.onerror = function(message, source, lineno, colno, error) {};
+
   let wsClient;
   let meetingId;
   let keepAlive;
+  let messageWrapper;
+
+  // Util functions
 
   function contains(selector, text) {
     var elements = document.querySelectorAll(selector);
@@ -14,10 +19,34 @@
     });
   }
 
+  const sanitize = str => {
+    var temp = document.createElement("div");
+    temp.textContent = str;
+    return temp.innerHTML;
+  };
+
+  function debounce(func, delay) {
+    let inDebounce;
+    return function() {
+      const context = this;
+      const args = arguments;
+      clearTimeout(inDebounce);
+      inDebounce = setTimeout(() => func.apply(context, args), delay);
+    };
+  }
+
+  function generateUUID() {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
+      var r = (Math.random() * 16) | 0,
+        v = c == "x" ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  }
+
   meetingId = document.querySelector("[data-unresolved-meeting-id]").getAttribute("data-unresolved-meeting-id");
 
   const dataScript = contains("script", "ds:7");
-  const assets = JSON.parse(document.querySelector("#nodAssetData").innerHTML);
+  const assets = JSON.parse(document.querySelector("#nodAssetData").textContent);
   const userData = JSON.parse(dataScript[1].text.match(/\[[^\}]*/)[0]);
   const name = userData[6];
 
@@ -26,144 +55,152 @@
     let username = name.split(" ")[0];
     let team = userData[28];
 
-    // Create Functions
+    const createButtons = () => {
+      // Create Tray
+      const ownVideoPreview = document.querySelector("[data-fps-request-screencast-cap]");
+      const tray = ownVideoPreview.parentElement.parentElement.parentElement.parentElement;
+      const trayInner = ownVideoPreview.parentElement.parentElement.parentElement;
 
-    const createMessageWrapper = () => {
-      var messageWrapper = document.createElement("DIV");
-      messageWrapper.classList.add("nod-messageWrapper");
-      return messageWrapper;
-    };
+      const newTray = document.createElement("DIV");
+      newTray.classList = tray.classList;
+      newTray.style.right = "auto";
+      newTray.style.zIndex = "1000000";
+      newTray.style.borderRadius = "0 0 8px 0";
 
-    let messageWrapper = createMessageWrapper();
+      const newTrayInner = document.createElement("DIV");
+      newTrayInner.classList = trayInner.classList;
+      newTrayInner.style.borderRadius = "0 0 8px 0";
+      newTrayInner.setAttribute("id", "tray-inner");
 
-    const createBtn = (emojiName, small, tip) => {
-      const btnWrapper = document.createElement("DIV");
-      const btn = document.createElement("DIV");
-      const img = document.createElement("IMG");
-      const emoji = assets[emojiName];
+      // Add our thumbs up button
+      const toggleButton = document.createElement("div");
+      toggleButton.classList = trayInner.children[0].classList;
+      toggleButton.classList.add("nod-tray-button");
+      toggleButton.classList = trayInner.children[0].classList;
+      toggleButton.classList.add("nod-tray-button");
 
-      img.setAttribute("src", emoji);
-      img.classList.add("nod-emoji");
+      const thumbEmoji = assets["thumb"];
+      const thumb = document.createElement("IMG");
+      thumb.setAttribute("src", thumbEmoji);
+      thumb.style.height = "42px";
+      toggleButton.appendChild(thumb);
 
-      btn.classList.add("nod-btn");
-      small && btn.classList.add("small");
-      btn.appendChild(img);
-      btnWrapper.classList.add("nod-btn-wrapper");
-      btnWrapper.appendChild(btn);
+      // Add divider
+      const divider = document.createElement("DIV");
+      divider.classList = trayInner.children[1].classList;
 
-      if (tip) {
-        let tooltip = createTooltip(tip);
+      // Add hands up button
+      const handsUpButton = document.createElement("div");
+      handsUpButton.classList = trayInner.children[0].classList;
+      handsUpButton.classList.add("nod-tray-button");
 
-        btn.addEventListener("mouseenter", () => {
-          btnWrapper.appendChild(tooltip);
-        });
+      const handEmoji = assets["handStatic"];
+      const hand = document.createElement("IMG");
+      hand.setAttribute("src", handEmoji);
+      hand.style.height = "32px";
+      handsUpButton.appendChild(hand);
 
-        btn.addEventListener("mouseleave", () => {
-          btnWrapper.removeChild(tooltip);
-        });
-      }
-
-      btn.addEventListener(
-        "click",
-        debounce(() => {
-          const messageData = {
-            action: "MESSAGE",
-            message: { id: meetingId, emoji: emoji, username: username, img: avatar }
-          };
-          insertMessage(messageData, messageWrapper);
-          wsClient.send(JSON.stringify(messageData));
-        }, 500)
-      );
-      return btnWrapper;
-    };
-
-    const createHandUpBtn = (emojiName, tip) => {
-      const btnWrapper = document.createElement("DIV");
-      const btnBlock = document.createElement("DIV");
-      const btn = document.createElement("DIV");
-      const img = document.createElement("IMG");
-      const emoji = assets[emojiName];
-
-      img.setAttribute("src", emoji);
-      img.classList.add("nod-emoji");
-
-      btn.classList.add("nod-btn");
-      btn.classList.add("small");
-      btn.appendChild(img);
-
-      btnBlock.classList.add("nod-btn-wrapper");
-      btnWrapper.classList.add("nod-handsup-wrapper");
-
-      btnBlock.appendChild(btn);
-      btnWrapper.appendChild(btnBlock);
-
-      if (tip) {
-        let tooltip = createTooltip(tip);
-
-        btnBlock.addEventListener("mouseenter", () => {
-          btnBlock.appendChild(tooltip);
-        });
-
-        btnBlock.addEventListener("mouseleave", () => {
-          btnBlock.removeChild(tooltip);
-        });
-      }
-
-      btn.addEventListener(
+      handsUpButton.addEventListener(
         "click",
         debounce(() => {
           const messageData = {
             action: "QUEUE",
-            message: { id: meetingId, emoji: emoji, username: `${username} raised their hand`, img: avatar, messageId: generateUUID() }
+            message: { id: meetingId, emoji: "hand", username: sanitize(`${username} raised their hand`), img: sanitize(avatar), messageId: generateUUID() }
           };
-          addToQueue(messageData, messageWrapper);
+          insertMessage(messageData, true);
           wsClient.send(JSON.stringify(messageData));
         }, 500)
       );
-      return btnWrapper;
+
+      // Append all to tray
+
+      newTrayInner.append(toggleButton);
+      newTrayInner.append(divider);
+      newTrayInner.append(handsUpButton);
+
+      newTray.appendChild(newTrayInner);
+      document.body.appendChild(newTray);
+
+      // Create dropdown
+      let dropdown = document.createElement("DIV");
+      dropdown.classList.add("nod-dropdown");
+
+      // Create Messages Wrapper
+      messageWrapper = document.createElement("DIV");
+      messageWrapper.classList.add("nod-messageWrapper");
+      document.body.appendChild(messageWrapper);
+
+      //Create emotes
+      const thumbBtn = createButton("thumb", "Thumbs up");
+      const lolBtn = createButton("laugh", "LOL!");
+      const loveBtn = createButton("love", "Wow!");
+      const clapBtn = createButton("clap", "Well Done");
+
+      const issuesArea = document.createElement("DIV");
+      issuesArea.classList.add("nod-issues-area");
+      issuesArea.innerHTML = "Having issues? <a>Reload</a>";
+
+      // Make a simple request:
+      issuesArea.addEventListener("click", () => {
+        document.querySelector(".nod-dropdown").remove();
+        let tray = document.querySelector("#tray-inner");
+        tray.style.borderRadius = "0 0 8px 0";
+        chrome.runtime.sendMessage("oikgofeboedgfkaacpfepbfmgdalabej", { reload: true });
+        tray.style.opacity = "0.5";
+        setTimeout(() => {
+          tray.style.opacity = "1";
+        }, 600);
+      });
+
+      dropdown.appendChild(thumbBtn);
+      dropdown.appendChild(loveBtn);
+      dropdown.appendChild(lolBtn);
+      dropdown.appendChild(clapBtn);
+      dropdown.appendChild(issuesArea);
+
+      toggleButton.addEventListener("mouseenter", () => {
+        toggleButton.appendChild(dropdown);
+        newTrayInner.style.borderRadius = "0";
+      });
+      toggleButton.addEventListener("mouseleave", () => {
+        toggleButton.removeChild(dropdown);
+        newTrayInner.style.borderRadius = "0 0 8px 0";
+      });
     };
 
-    const createTray = () => {
-      const tray = document.createElement("DIV");
-      const subTray = document.createElement("DIV");
-      const thumb = createBtn("thumb");
+    const createButton = (emojiName, title) => {
+      const btn = document.createElement("DIV");
+      const img = document.createElement("IMG");
+      const titleDiv = document.createElement("DIV");
 
-      tray.classList.add("nod-appWrapper");
-      tray.classList.add("nod-tray");
-      subTray.classList.add("nod-tray");
-      tray.append(thumb);
+      img.setAttribute("src", assets[emojiName]);
+      img.classList.add("nod-emoji");
 
-      [
-        ["love", "Love&nbsp;it!"],
-        ["confused", "I'm&nbsp;Confused?"],
-        ["laugh", "LOL"],
-        ["clap", "Well&nbsp;Done!"]
-      ].forEach(e => {
-        let btn = createBtn(e[0], true, e[1]);
-        subTray.append(btn);
+      titleDiv.textContent = title;
+
+      btn.classList.add("nod-dropdown-item");
+      btn.appendChild(img);
+      btn.appendChild(titleDiv);
+
+      btn.addEventListener("click", () => {
+        document.querySelector(".nod-dropdown").remove();
+        document.querySelector("#tray-inner").style.borderRadius = "0 0 8px 0";
+        const messageData = {
+          action: "MESSAGE",
+          message: { id: meetingId, emoji: sanitize(emojiName), username: sanitize(username), img: sanitize(avatar) }
+        };
+        insertMessage(messageData);
+        wsClient.send(JSON.stringify(messageData));
       });
-
-      let btn = createHandUpBtn("hand", "Raise&nbsp;your&nbsp;hand");
-      subTray.append(btn);
-
-      tray.addEventListener("mouseenter", () => {
-        tray.appendChild(subTray);
-      });
-
-      tray.addEventListener("mouseleave", () => {
-        tray.removeChild(subTray);
-      });
-
-      return tray;
+      return btn;
     };
 
-    let appWrapper = createTray();
-
-    const createMessage = data => {
+    const insertMessage = (data, removable = false) => {
       const messageItem = document.createElement("DIV");
       const img = document.createElement("IMG");
       const emojiWrapper = document.createElement("DIV");
       const emoji = document.createElement("IMG");
+      const name = document.createElement("DIV");
 
       messageItem.classList.add("nod-message");
 
@@ -172,88 +209,45 @@
 
       emojiWrapper.classList.add("nod-emoji-wrapper");
 
-      emoji.setAttribute("src", data.message.emoji);
+      emoji.setAttribute("src", assets[data.message.emoji]);
       emoji.classList.add("nod-emoji");
+
+      name.textContent = data.message.username;
 
       emojiWrapper.appendChild(emoji);
       messageItem.appendChild(emojiWrapper);
       messageItem.appendChild(img);
-      messageItem.innerHTML += `${data.message.username}`;
+      messageItem.appendChild(name);
 
-      return messageItem;
-    };
-
-    // Util functions
-
-    function debounce(func, delay) {
-      let inDebounce;
-      return function() {
-        const context = this;
-        const args = arguments;
-        clearTimeout(inDebounce);
-        inDebounce = setTimeout(() => func.apply(context, args), delay);
-      };
-    }
-
-    function generateUUID() {
-      return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
-        var r = (Math.random() * 16) | 0,
-          v = c == "x" ? r : (r & 0x3) | 0x8;
-        return v.toString(16);
-      });
-    }
-
-    function insertMessage(data, container) {
-      const item = container.insertAdjacentElement("afterbegin", createMessage(data));
-      setTimeout(() => {
-        item.classList.add("nod-removed");
-        setTimeout(() => {
-          item.remove();
-        }, 300);
-      }, 5000);
-    }
-
-    function addToQueue(data, container) {
-      const item = container.insertAdjacentElement("afterbegin", createMessage(data));
-      const id = data.message.messageId;
-      const hand = assets["hand"];
-      const close = assets["down"];
-
-      item.setAttribute("data-id", id);
-      item.classList.add("nod-removable");
-
-      item.addEventListener("mouseenter", () => {
+      const item = messageWrapper.insertAdjacentElement("afterbegin", messageItem);
+      if (removable) {
+        const id = data.message.messageId;
+        item.setAttribute("data-id", id);
+        item.classList.add("nod-removable");
         let emoji = item.querySelector(".nod-emoji");
-        emoji.setAttribute("src", close);
-      });
 
-      item.addEventListener("mouseleave", () => {
-        let emoji = item.querySelector(".nod-emoji");
-        emoji.setAttribute("src", hand);
-      });
-
-      item.addEventListener("click", () => {
-        wsClient.send(JSON.stringify({ action: "REMOVE", message: { id: meetingId, messageId: id } }));
-        removeFromQueue(id, container);
-      });
-    }
-
-    function removeFromQueue(id) {
-      const removableItem = messageWrapper.querySelector(`[data-id='${id}']`);
-      if (removableItem) {
-        removableItem.classList.add("nod-removed");
+        item.addEventListener("mouseenter", () => {
+          emoji.setAttribute("src", assets["down"]);
+        });
+        item.addEventListener("mouseleave", () => {
+          emoji.setAttribute("src", assets["hand"]);
+        });
+        item.addEventListener("click", () => {
+          wsClient.send(JSON.stringify({ action: "REMOVE", message: { id: meetingId, messageId: id } }));
+          item.classList.add("nod-removed");
+          setTimeout(() => {
+            item.remove();
+          }, 300);
+        });
+      } else {
         setTimeout(() => {
-          removableItem.remove();
-        }, 300);
+          item.classList.add("nod-removed");
+          setTimeout(() => {
+            item.remove();
+          }, 300);
+        }, 5000);
       }
-    }
-
-    function createTooltip(text) {
-      const wrapper = document.createElement("DIV");
-      wrapper.classList.add("nod-tooltip");
-      wrapper.innerHTML += text;
-      return wrapper;
-    }
+    };
 
     //
     // Initialize
@@ -268,9 +262,9 @@
       wsClient = new WebSocket(wsUrl);
 
       wsClient.addEventListener("open", () => {
-        document.body.appendChild(appWrapper);
-        document.body.appendChild(messageWrapper);
+        createButtons();
         wsClient.send(JSON.stringify({ route: "join", data: { id: meetingId, team: team } }));
+
         console.log("%c Initialised Nod Extension.", "background: #4D2F3C; color: #FBE2A0");
         console.log("%c Something gone wrong? Let me know - hi@jamiec.io", "background: #4D2F3C; color: #FBE2A0");
 
@@ -282,13 +276,17 @@
           }
           switch (data.action) {
             case "MESSAGE":
-              insertMessage(data, messageWrapper);
+              insertMessage(data);
               break;
             case "QUEUE":
-              addToQueue(data, messageWrapper);
+              insertMessage(data, true);
               break;
             case "REMOVE":
-              removeFromQueue(data.message.messageId);
+              let removable = document.querySelector(`[data-id=${data.message.messageId}`);
+              removable.classList.add("nod-removed");
+              setTimeout(() => {
+                removable.remove();
+              }, 300);
               break;
           }
         });
@@ -304,5 +302,4 @@
 
     init();
   }
-  window.onerror = function(message, source, lineno, colno, error) {};
 })();

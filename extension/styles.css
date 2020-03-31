@@ -51,7 +51,7 @@
   opacity: 1;
 }
 
-.nod-tooltip {
+/* .nod-tooltip {
   background-color: white;
   color: black;
   padding: 3px 10px;
@@ -60,7 +60,7 @@
   bottom: -35px;
   border-radius: 5px;
   transform: translate(-50%);
-  width: auto;
+  width: 100%;
   animation-name: fade;
   animation-duration: 1s;
 }
@@ -78,7 +78,7 @@
   padding: 3px;
   transform: rotate(-135deg);
   -webkit-transform: rotate(-135deg);
-}
+} */
 
 .nod-tray {
   display: flex;
@@ -129,7 +129,7 @@
 
 .nod-emoji {
   width: 80%;
-  max-width: 50px;
+  max-width: 42px;
 }
 
 .nod-handsup-emoji {
@@ -160,4 +160,46 @@
 .nod-removed {
   opacity: 0;
   margin-bottom: -50px;
+}
+
+.nod-tray-button {
+  padding: 0 10px;
+  display: flex;
+  overflow: visible !important;
+}
+
+.nod-tray-button:hover {
+  background-color: rgba(128, 134, 139, 0.122);
+}
+
+.N1c98 {
+  padding-left: 180px !important;
+}
+
+.nod-dropdown {
+  position: absolute;
+  top: 48px;
+  left: 0;
+  background-color: white;
+  border-top: 1px solid #eee;
+  border-radius: 0 0 8px 0;
+  width: 173px;
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302), 0 6px 6px 2px rgba(60, 64, 67, 0.149);
+}
+
+.nod-dropdown-item {
+  padding: 5px 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.nod-dropdown-item:hover {
+  background-color: rgba(128, 134, 139, 0.122);
+}
+
+.nod-issues-area {
+  font-size: 11px;
+  background-color: #eee;
+  border-radius: 0 0 8px;
 }
