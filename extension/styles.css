@@ -172,7 +172,14 @@
   background-color: rgba(128, 134, 139, 0.122);
 }
 
-.N1c98 {
+.nod-tray-button:focus,
+.nod-dropdown-item:focus,
+.nod-issues-area:focus {
+  background-color: rgba(2, 191, 165, 0.15);
+  outline: #00bfa5 solid 4px;
+}
+
+.pHsCke {
   padding-left: 180px !important;
 }
 

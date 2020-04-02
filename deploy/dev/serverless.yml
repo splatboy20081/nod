@@ -1,3 +1,6 @@
+provider:
+  profile: HomeHero
+
 connectionTable:
   component: "@serverless/aws-dynamodb"
   inputs:
@@ -26,7 +29,7 @@ connectionTable:
 teamsTable:
   component: "@serverless/aws-dynamodb"
   inputs:
-    name: nod-teams-dev-v2
+    name: nod-teams-dev
     attributeDefinitions:
       - AttributeName: teamName
         AttributeType: S
@@ -38,9 +41,9 @@ teamsTable:
 websocketApi:
   component: "@serverless/backend-socket"
   inputs:
-    name: nod-websocket
+    name: nod-websocket-dev
     stage: dev
-    description: Nod-Dev Websocket Backend
+    description: Nod - dev websocket
     region: us-east-1
     memory: 128
     timeout: 10

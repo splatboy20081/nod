@@ -1,29 +1,51 @@
 connectionTable:
   component: "@serverless/aws-dynamodb"
   inputs:
-    name: nod-prod-connections
+    name: nod-connections-prod
     attributeDefinitions:
-      - AttributeName: connectionId
+      - AttributeName: connectionID
         AttributeType: S
-      - AttributeName: meetingId
+      - AttributeName: meetingID
         AttributeType: S
     keySchema:
-      - AttributeName: connectionId
+      - AttributeName: connectionID
         KeyType: HASH
-      - AttributeName: meetingId
+      - AttributeName: meetingID
         KeyType: RANGE
+    globalSecondaryIndexes:
+      - IndexName: meetingIndex
+        KeySchema:
+          - AttributeName: meetingID
+            KeyType: HASH
+          - AttributeName: connectionID
+            KeyType: RANGE
+        Projection:
+          ProjectionType: "KEYS_ONLY"
+    region: us-east-1
+
+teamsTable:
+  component: "@serverless/aws-dynamodb"
+  inputs:
+    name: nod-teams-prod
+    attributeDefinitions:
+      - AttributeName: teamName
+        AttributeType: S
+    keySchema:
+      - AttributeName: teamName
+        KeyType: HASH
     region: us-east-1
 
 websocketApi:
   component: "@serverless/backend-socket"
   inputs:
-    name: nod-prod-websocket
+    name: nod-websocket-prod
     stage: prod
-    description: Nod-Prod Websocket Backend
+    description: Nod - prod websocket
     region: us-east-1
     memory: 128
     timeout: 10
     env:
       connectionDb: ${connectionTable.name}
+      teamsDb: ${teamsTable.name}
     code:
       src: ../../backend/socket

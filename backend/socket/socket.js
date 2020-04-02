@@ -51,7 +51,11 @@ on("disconnect", async (data, socket) => {
 });
 
 on("ping", async (data, socket) => {
-  await socket.send(JSON.stringify({ action: "PING" }), socket.id);
+  try {
+    await socket.send(JSON.stringify({ action: "PING" }), socket.id);
+  } catch (err) {
+    console.log("Ping failed - old DB");
+  }
 });
 
 on("default", async (data, socket) => {

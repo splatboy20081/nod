@@ -9,6 +9,7 @@
   let meetingId;
   let keepAlive;
   let messageWrapper;
+  let newTray;
 
   // Util functions
 
@@ -43,6 +44,20 @@
     });
   }
 
+  document.addEventListener("keydown", function(event) {
+    if (event.keyCode === 9) {
+      if (document.activeElement == document.body || document.activeElement == null) {
+        event.preventDefault();
+        document.querySelector("#nod-btn").focus();
+      }
+    }
+
+    if (event.keyCode === 13) {
+      event.preventDefault();
+      document.activeElement.click();
+    }
+  });
+
   meetingId = document.querySelector("[data-unresolved-meeting-id]").getAttribute("data-unresolved-meeting-id");
 
   const dataScript = contains("script", "ds:7");
@@ -61,7 +76,7 @@
       const tray = ownVideoPreview.parentElement.parentElement.parentElement.parentElement;
       const trayInner = ownVideoPreview.parentElement.parentElement.parentElement;
 
-      const newTray = document.createElement("DIV");
+      newTray = document.createElement("DIV");
       newTray.classList = tray.classList;
       newTray.style.right = "auto";
       newTray.style.zIndex = "1000000";
@@ -73,26 +88,33 @@
       newTrayInner.setAttribute("id", "tray-inner");
 
       // Add our thumbs up button
-      const toggleButton = document.createElement("div");
+      const toggleButton = document.createElement("a");
       toggleButton.classList = trayInner.children[0].classList;
       toggleButton.classList.add("nod-tray-button");
       toggleButton.classList = trayInner.children[0].classList;
       toggleButton.classList.add("nod-tray-button");
+      toggleButton.setAttribute("id", "nod-btn");
 
       const thumbEmoji = assets["thumb"];
       const thumb = document.createElement("IMG");
       thumb.setAttribute("src", thumbEmoji);
       thumb.style.height = "42px";
       toggleButton.appendChild(thumb);
+      toggleButton.setAttribute("tabindex", 0);
+      toggleButton.setAttribute("aria-label", "Open Nod extension");
+      toggleButton.setAttribute("role", "button");
 
       // Add divider
       const divider = document.createElement("DIV");
       divider.classList = trayInner.children[1].classList;
 
       // Add hands up button
-      const handsUpButton = document.createElement("div");
+      const handsUpButton = document.createElement("a");
       handsUpButton.classList = trayInner.children[0].classList;
       handsUpButton.classList.add("nod-tray-button");
+      handsUpButton.setAttribute("tabindex", 0);
+      handsUpButton.setAttribute("aria-label", "Raise your hand");
+      handsUpButton.setAttribute("role", "button");
 
       const handEmoji = assets["handStatic"];
       const hand = document.createElement("IMG");
@@ -119,11 +141,12 @@
       newTrayInner.append(handsUpButton);
 
       newTray.appendChild(newTrayInner);
-      document.body.appendChild(newTray);
+      document.body.prepend(newTray);
 
       // Create dropdown
       let dropdown = document.createElement("DIV");
       dropdown.classList.add("nod-dropdown");
+      dropdown.setAttribute("id", "nod-dropdown");
 
       // Create Messages Wrapper
       messageWrapper = document.createElement("DIV");
@@ -131,16 +154,19 @@
       document.body.appendChild(messageWrapper);
 
       //Create emotes
-      const thumbBtn = createButton("thumb", "Thumbs up");
-      const lolBtn = createButton("laugh", "LOL!");
-      const loveBtn = createButton("love", "Wow!");
-      const clapBtn = createButton("clap", "Well Done");
+      const thumbBtn = createButton("thumb", "Thumbs up", "Send thumbs up emoji");
+      const confusedBtn = createButton("confused", "Hmm?", "Send confused emoji");
+      const lolBtn = createButton("laugh", "LOL!", "Send laughing emoji");
+      const loveBtn = createButton("love", "Wow!", "Send excited face emoji");
+      const clapBtn = createButton("clap", "Well Done", "Send clapping hands emoji");
 
       const issuesArea = document.createElement("DIV");
       issuesArea.classList.add("nod-issues-area");
       issuesArea.innerHTML = "Having issues? <a>Reload</a>";
+      issuesArea.setAttribute("tabindex", 0);
+      issuesArea.setAttribute("aria-label", "Reload nod extension");
+      issuesArea.setAttribute("role", "button");
 
-      // Make a simple request:
       issuesArea.addEventListener("click", () => {
         document.querySelector(".nod-dropdown").remove();
         let tray = document.querySelector("#tray-inner");
@@ -152,23 +178,58 @@
         }, 600);
       });
 
+      issuesArea.addEventListener("click", () => {
+        chrome.runtime.sendMessage("oikgofeboedgfkaacpfepbfmgdalabej", { reload: true });
+        destroy();
+        init();
+      });
+
       dropdown.appendChild(thumbBtn);
+      dropdown.appendChild(confusedBtn);
       dropdown.appendChild(loveBtn);
       dropdown.appendChild(lolBtn);
       dropdown.appendChild(clapBtn);
       dropdown.appendChild(issuesArea);
 
+      document.addEventListener("keyup", () => {
+        if (event.keyCode === 13) {
+          if (document.activeElement == toggleButton) {
+            event.preventDefault();
+            toggleButton.appendChild(dropdown);
+            newTrayInner.style.borderRadius = "0";
+            dropdown.firstChild.focus();
+          } else {
+            event.preventDefault();
+            document.activeElement.click();
+          }
+        }
+      });
+
+      toggleButton.addEventListener("focus", () => {
+        if (document.querySelector("#nod-dropdown")) {
+          toggleButton.removeChild(dropdown);
+          newTrayInner.style.borderRadius = "0 0 8px 0";
+        }
+      });
+      handsUpButton.addEventListener("focus", () => {
+        if (document.querySelector("#nod-dropdown")) {
+          toggleButton.removeChild(dropdown);
+          newTrayInner.style.borderRadius = "0 0 8px 0";
+        }
+      });
+
       toggleButton.addEventListener("mouseenter", () => {
         toggleButton.appendChild(dropdown);
         newTrayInner.style.borderRadius = "0";
       });
+
       toggleButton.addEventListener("mouseleave", () => {
         toggleButton.removeChild(dropdown);
         newTrayInner.style.borderRadius = "0 0 8px 0";
       });
     };
 
-    const createButton = (emojiName, title) => {
+    const createButton = (emojiName, title, label) => {
       const btn = document.createElement("DIV");
       const img = document.createElement("IMG");
       const titleDiv = document.createElement("DIV");
@@ -181,6 +242,9 @@
       btn.classList.add("nod-dropdown-item");
       btn.appendChild(img);
       btn.appendChild(titleDiv);
+      btn.setAttribute("tabindex", 0);
+      btn.setAttribute("aria-label", label);
+      btn.setAttribute("role", "button");
 
       btn.addEventListener("click", () => {
         document.querySelector(".nod-dropdown").remove();
@@ -253,12 +317,22 @@
     // Initialize
     //
 
+    const destroy = () => {
+      if (wsClient.readyState != WebSocket.CLOSED) {
+        clearInterval(keepAlive);
+        wsClient.send(JSON.stringify({ route: "disconnect", data: { id: meetingId } }));
+        newTray.remove();
+        messageWrapper.remove();
+        wsClient.close();
+      }
+    };
+
     const init = async () => {
       while (document.querySelector(".d7iDfe") !== null) {
         await new Promise(r => setTimeout(r, 500));
       }
 
-      const wsUrl = IS_DEV_MODE ? "wss://ypuphzsg9c.execute-api.us-east-1.amazonaws.com/dev/" : "wss://6qp9an2k9b.execute-api.us-east-1.amazonaws.com/prod/";
+      const wsUrl = IS_DEV_MODE ? "wss://ypuphzsg9c.execute-api.us-east-1.amazonaws.com/dev/" : "wss://j24amtdvi4.execute-api.us-east-1.amazonaws.com/prod";
       wsClient = new WebSocket(wsUrl);
 
       wsClient.addEventListener("open", () => {
@@ -282,13 +356,17 @@
               insertMessage(data, true);
               break;
             case "REMOVE":
-              let removable = document.querySelector(`[data-id=${data.message.messageId}`);
+              let removable = document.querySelector(`[data-id="${data.message.messageId}"]`);
               removable.classList.add("nod-removed");
               setTimeout(() => {
                 removable.remove();
               }, 300);
               break;
           }
+        });
+
+        window.addEventListener("beforeunload", event => {
+          destroy();
         });
 
         const ping = () => {
@@ -298,6 +376,12 @@
 
         keepAlive = setInterval(ping, 60000 * 5);
       });
+
+      while (document.querySelector("[data-call-ended='true']") == null) {
+        await new Promise(r => setTimeout(r, 500));
+      }
+
+      destroy();
     };
 
     init();
