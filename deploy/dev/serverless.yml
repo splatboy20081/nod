@@ -1,6 +1,3 @@
-provider:
-  profile: HomeHero
-
 connectionTable:
   component: "@serverless/aws-dynamodb"
   inputs:
