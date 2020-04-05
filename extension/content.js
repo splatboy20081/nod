@@ -1,6 +1,8 @@
+import * as utils from "./src/utils/index.js";
+
 (async () => {
   // REMEMBER TO TURN THIS BACK OFF YOU TIT.
-  const IS_DEV_MODE = false;
+  const IS_DEV_MODE = true;
   // YES. THIS IS AWFUL CODE. BUT DONT FORGET.
 
   window.onerror = function(message, source, lineno, colno, error) {};
@@ -10,39 +12,6 @@
   let keepAlive;
   let messageWrapper;
   let newTray;
-
-  // Util functions
-
-  function contains(selector, text) {
-    var elements = document.querySelectorAll(selector);
-    return [].filter.call(elements, function(element) {
-      return RegExp(text).test(element.textContent);
-    });
-  }
-
-  const sanitize = str => {
-    var temp = document.createElement("div");
-    temp.textContent = str;
-    return temp.innerHTML;
-  };
-
-  function debounce(func, delay) {
-    let inDebounce;
-    return function() {
-      const context = this;
-      const args = arguments;
-      clearTimeout(inDebounce);
-      inDebounce = setTimeout(() => func.apply(context, args), delay);
-    };
-  }
-
-  function generateUUID() {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
-      var r = (Math.random() * 16) | 0,
-        v = c == "x" ? r : (r & 0x3) | 0x8;
-      return v.toString(16);
-    });
-  }
 
   document.addEventListener("keydown", function(event) {
     if (event.keyCode === 9) {
@@ -60,7 +29,7 @@
 
   meetingId = document.querySelector("[data-unresolved-meeting-id]").getAttribute("data-unresolved-meeting-id");
 
-  const dataScript = contains("script", "ds:7");
+  const dataScript = utils.contains("script", "ds:7");
   const assets = JSON.parse(document.querySelector("#nodAssetData").textContent);
   const userData = JSON.parse(dataScript[1].text.match(/\[[^\}]*/)[0]);
   const name = userData[6];
@@ -89,9 +58,9 @@
 
       // Add our thumbs up button
       const toggleButton = document.createElement("a");
-      toggleButton.classList = trayInner.children[0].classList;
+      toggleButton.classList = trayInner.querySelector("[data-tab-id='1']").classList;
       toggleButton.classList.add("nod-tray-button");
-      toggleButton.classList = trayInner.children[0].classList;
+      toggleButton.classList = trayInner.querySelector("[data-tab-id='1']").classList;
       toggleButton.classList.add("nod-tray-button");
       toggleButton.setAttribute("id", "nod-btn");
 
@@ -124,10 +93,10 @@
 
       handsUpButton.addEventListener(
         "click",
-        debounce(() => {
+        utils.debounce(() => {
           const messageData = {
             action: "QUEUE",
-            message: { id: meetingId, emoji: "hand", username: sanitize(`${username} raised their hand`), img: sanitize(avatar), messageId: generateUUID() }
+            message: { id: meetingId, emoji: "hand", username: utils.sanitize(`${username} raised their hand`), img: utils.sanitize(avatar), messageId: utils.generateUUID() }
           };
           insertMessage(messageData, true);
           wsClient.send(JSON.stringify(messageData));
@@ -167,16 +136,16 @@
       issuesArea.setAttribute("aria-label", "Reload nod extension");
       issuesArea.setAttribute("role", "button");
 
-      issuesArea.addEventListener("click", () => {
-        document.querySelector(".nod-dropdown").remove();
-        let tray = document.querySelector("#tray-inner");
-        tray.style.borderRadius = "0 0 8px 0";
-        chrome.runtime.sendMessage("oikgofeboedgfkaacpfepbfmgdalabej", { reload: true });
-        tray.style.opacity = "0.5";
-        setTimeout(() => {
-          tray.style.opacity = "1";
-        }, 600);
-      });
+      // issuesArea.addEventListener("click", () => {
+      //   document.querySelector(".nod-dropdown").remove();
+      //   let tray = document.querySelector("#tray-inner");
+      //   tray.style.borderRadius = "0 0 8px 0";
+      //   chrome.runtime.sendMessage("oikgofeboedgfkaacpfepbfmgdalabej", { reload: true });
+      //   tray.style.opacity = "0.5";
+      //   setTimeout(() => {
+      //     tray.style.opacity = "1";
+      //   }, 600);
+      // });
 
       issuesArea.addEventListener("click", () => {
         chrome.runtime.sendMessage("oikgofeboedgfkaacpfepbfmgdalabej", { reload: true });
@@ -251,7 +220,7 @@
         document.querySelector("#tray-inner").style.borderRadius = "0 0 8px 0";
         const messageData = {
           action: "MESSAGE",
-          message: { id: meetingId, emoji: sanitize(emojiName), username: sanitize(username), img: sanitize(avatar) }
+          message: { id: meetingId, emoji: utils.sanitize(emojiName), username: utils.sanitize(username), img: utils.sanitize(avatar) }
         };
         insertMessage(messageData);
         wsClient.send(JSON.stringify(messageData));

@@ -26,7 +26,7 @@ const injectScript = (file_path, type = "script", tag = "html", text = "", callb
 };
 
 injectScript(chrome.runtime.getURL("styles.css"), "link", "head");
-injectScript(chrome.runtime.getURL("content.js"));
+injectScript(chrome.runtime.getURL("content.js"), "module");
 
 // injectScript(chrome.runtime.getURL("src/index.js"), "module");
 injectScript(
@@ -34,13 +34,13 @@ injectScript(
   "script",
   "html",
   `{
-      "thumb" : "${chrome.runtime.getURL("img/thumb.png")}",
-      "confused" : "${chrome.runtime.getURL("img/confused.gif")}",
-      "clap" : "${chrome.runtime.getURL("img/clap.gif")}",
-      "laugh" : "${chrome.runtime.getURL("img/laugh.gif")}",
-      "love" : "${chrome.runtime.getURL("img/love.gif")}",
-      "hand" : "${chrome.runtime.getURL("img/hand.gif")}",
-      "down" : "${chrome.runtime.getURL("img/down.png")}",
-      "handStatic" : "${chrome.runtime.getURL("img/hand.png")}"
+      "thumb" : "${chrome.runtime.getURL("src/img/thumb.png")}",
+      "confused" : "${chrome.runtime.getURL("src/img/confused.gif")}",
+      "clap" : "${chrome.runtime.getURL("src/img/clap.gif")}",
+      "laugh" : "${chrome.runtime.getURL("src/img/laugh.gif")}",
+      "love" : "${chrome.runtime.getURL("src/img/love.gif")}",
+      "hand" : "${chrome.runtime.getURL("src/img/hand.gif")}",
+      "down" : "${chrome.runtime.getURL("src/img/down.png")}",
+      "handStatic" : "${chrome.runtime.getURL("src/img/hand.png")}"
     }`
 );
