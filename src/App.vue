@@ -87,7 +87,7 @@ export default {
 
       // wait for meet to relay call ended message
       while (document.querySelector("[data-call-ended='true']") == null) {
-        await new Promise(r => setTimeout(r, 500));
+        await new Promise(r => setTimeout(r, 200));
       }
       this.loaded = false;
       this.$socket.sendObj({ route: "disconnect", data: { id: this.$store.getters.getUser("meetingID") } });

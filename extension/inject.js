@@ -1,9 +1,17 @@
-const injectScript = (file_path, text = "") => {
-  var node = document.getElementsByTagName("html")[0];
-  var script = document.createElement("script");
-  if (text == "") {
+const injectScript = (file_path, type = "script", tag = "html", text = "") => {
+  var node = document.getElementsByTagName(tag)[0];
+  var tag_type = type == "link" ? "link" : "script";
+  var script = document.createElement(tag_type);
+  if (type == "script") {
     script.setAttribute("type", "text/javascript");
-    script.setAttribute("src", file_path);
+  } else if (type == "module") {
+    script.setAttribute("type", "module");
+  } else {
+    script.setAttribute("rel", "stylesheet");
+    script.setAttribute("media", "screen");
+  }
+  if (text == "") {
+    script.setAttribute(tag_type == "script" ? "src" : "href", file_path);
   } else {
     script.setAttribute("type", "application/json");
     script.setAttribute("id", "nodAssetData");
@@ -24,11 +32,14 @@ const injectScript = (file_path, text = "") => {
   document.body.prepend(app);
 
   // Inject script into page
-  injectScript(chrome.runtime.getURL("dist/app.js"));
-  injectScript(chrome.runtime.getURL("dist/chunk-vendors.js"));
+  injectScript(chrome.runtime.getURL("dist/app.css"), "link", "head");
+  injectScript(chrome.runtime.getURL("dist/app.js"), "script", "html");
+  injectScript(chrome.runtime.getURL("dist/chunk-vendors.js"), "script", "html");
 
   injectScript(
     null,
+    "script",
+    "html",
     `{
           "thumb" : "${chrome.runtime.getURL("img/thumb.png")}",
           "confused" : "${chrome.runtime.getURL("img/confused.gif")}",
