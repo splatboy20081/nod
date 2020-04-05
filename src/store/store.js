@@ -1,0 +1,88 @@
+import Vuex from "vuex";
+import Vue from "vue";
+
+Vue.use(Vuex);
+
+export default new Vuex.Store({
+  state: {
+    userData: {},
+    messages: [],
+    hands: [],
+    reactions: false,
+    settings: false,
+    updateAvailable: false,
+    updateChecked: false
+  },
+
+  getters: {
+    getAsset: state => key => {
+      return state.userData.assets[key];
+    },
+    getUser: state => key => {
+      return state.userData[key];
+    }
+  },
+
+  mutations: {
+    addMessage(state, data) {
+      state.messages.unshift(data);
+    },
+    removeMessage(state, messageData) {
+      state.messages = state.messages.filter(message => message != messageData);
+    },
+    addHand(state, data) {
+      state.hands.unshift(data);
+    },
+    removeHand(state, id) {
+      state.hands = state.hands.filter(hand => hand.messageId != id);
+    },
+    addUserData(state, data) {
+      state.userData = data;
+    },
+    openDropdown(state, dropdown) {
+      state[dropdown] = true;
+    },
+    closeDropdown(state, dropdown) {
+      state[dropdown] = false;
+    },
+    setUpdateStatus(state, boolean) {
+      state.updateAvailable = boolean;
+    },
+    setUpdateChecked(state, boolean) {
+      state.updateChecked = boolean;
+    }
+  },
+
+  actions: {
+    addMessage(context, messageData) {
+      context.commit("addMessage", messageData);
+      setTimeout(() => {
+        context.commit("removeMessage", messageData);
+      }, 3000);
+    },
+
+    addHand(context, messageData) {
+      context.commit("addHand", messageData);
+    },
+
+    removeHand(context, id) {
+      context.commit("removeHand", id);
+    },
+
+    openDropdown(context, dropdown) {
+      context.commit("openDropdown", dropdown);
+    },
+    closeDropdown(context, dropdown) {
+      context.commit("closeDropdown", dropdown);
+    },
+    addUserData(context, data) {
+      context.commit("addUserData", data);
+    },
+    setUpdateStatus(context, boolean) {
+      context.commit("setUpdateStatus", boolean);
+    },
+    setUpdateChecked(context, boolean) {
+      context.commit("setUpdateChecked", boolean);
+    }
+  }
+});
