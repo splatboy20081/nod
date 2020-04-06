@@ -14,29 +14,32 @@ export default {
   props: {
     emoji: String,
     text: String,
-    label: String
+    label: String,
   },
   methods: {
     sendMessage(emoji) {
       this.$store.dispatch("closeDropdown", "reactions");
-      this.$store.dispatch("addMessage", {
-        messageId: generateUUID(),
-        emoji: emoji,
-        username: this.$store.getters.getUser("name"),
-        img: this.$store.getters.getUser("avatar")
-      });
-
-      this.$socket.sendObj({
-        action: "MESSAGE",
-        message: {
-          id: this.$store.getters.getUser("meetingID"),
+      if (this.$store.state.messages.filter((h) => h.owner === true).length < 3) {
+        this.$store.dispatch("addMessage", {
+          messageId: generateUUID(),
           emoji: emoji,
           username: this.$store.getters.getUser("name"),
-          img: this.$store.getters.getUser("avatar")
-        }
-      });
-    }
-  }
+          img: this.$store.getters.getUser("avatar"),
+          owner: true,
+        });
+
+        this.$socket.sendObj({
+          action: "MESSAGE",
+          message: {
+            id: this.$store.getters.getUser("meetingID"),
+            emoji: emoji,
+            username: this.$store.getters.getUser("name"),
+            img: this.$store.getters.getUser("avatar"),
+          },
+        });
+      }
+    },
+  },
 };
 </script>
 
@@ -49,8 +52,8 @@ export default {
 }
 
 .dropdown-item {
-  padding: 5px 20px;
-  font-size: 14px;
+  padding: 3px 20px;
+  font-size: 15px;
   display: flex;
   align-items: center;
   position: relative;
@@ -62,5 +65,6 @@ export default {
 .emoji {
   width: 70%;
   max-width: 42px;
+  margin-right: 10px;
 }
 </style>

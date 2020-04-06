@@ -14,17 +14,17 @@ export default {
   name: "App",
   data() {
     return {
-      loaded: false
+      loaded: false,
     };
   },
   components: {
     ReactionTray,
-    MessageWrapper
+    MessageWrapper,
   },
   created: function() {
     this.getData();
     this.setupListeners();
-    this.$options.sockets.onopen = data => {
+    this.$options.sockets.onopen = (data) => {
       this.websocketInit();
     };
   },
@@ -40,7 +40,7 @@ export default {
         name: userData[6].split(" ")[0],
         team: userData[28],
         avatar: userData[5],
-        assets: assets
+        assets: assets,
       };
       this.$store.dispatch("addUserData", data);
     },
@@ -49,7 +49,13 @@ export default {
       this.loaded = true;
 
       // send join message to websocket
-      this.$socket.sendObj({ route: "join", data: { id: this.$store.getters.getUser("meetingID"), team: this.$store.getters.getUser("team") } });
+      this.$socket.sendObj({
+        route: "join",
+        data: {
+          id: this.$store.getters.getUser("meetingID"),
+          team: this.$store.getters.getUser("team"),
+        },
+      });
 
       // Send console message
       console.log("%c Initialised Nod Extension.", "background: #4D2F3C; color: #FBE2A0");
@@ -67,8 +73,19 @@ export default {
     setupListeners() {
       this.setupTabListener();
       this.setupDestroyListener();
+      this.setupVisibilityListeners();
     },
 
+    setupVisibilityListeners() {
+      const vm = this;
+      document.addEventListener("visibilitychange", function() {
+        if (document.visibilityState === "hidden") {
+          vm.$store.dispatch("setVisible", false);
+        } else {
+          vm.$store.dispatch("setVisible", true);
+        }
+      });
+    },
     setupTabListener() {
       document.addEventListener("keydown", function(event) {
         if (event.keyCode === 9) {
@@ -81,19 +98,25 @@ export default {
     },
 
     async setupDestroyListener() {
-      window.addEventListener("beforeunload", event => {
-        this.$socket.sendObj({ route: "disconnect", data: { id: this.$store.getters.getUser("meetingID") } });
+      window.addEventListener("beforeunload", (event) => {
+        this.$socket.sendObj({
+          route: "disconnect",
+          data: { id: this.$store.getters.getUser("meetingID") },
+        });
       });
 
       // wait for meet to relay call ended message
       while (document.querySelector("[data-call-ended='true']") == null) {
-        await new Promise(r => setTimeout(r, 200));
+        await new Promise((r) => setTimeout(r, 200));
       }
       this.loaded = false;
-      this.$socket.sendObj({ route: "disconnect", data: { id: this.$store.getters.getUser("meetingID") } });
+      this.$socket.sendObj({
+        route: "disconnect",
+        data: { id: this.$store.getters.getUser("meetingID") },
+      });
       this.$socket.close();
-    }
-  }
+    },
+  },
 };
 </script>
 

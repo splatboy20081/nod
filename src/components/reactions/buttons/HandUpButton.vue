@@ -18,28 +18,31 @@ export default {
       //Generate id
       const id = generateUUID();
       // Send local version to store
-      this.$store.dispatch("addHand", {
-        emoji: "hand",
-        username: `${this.$store.getters.getUser("name")} raised their hand`,
-        img: this.$store.getters.getUser("avatar"),
-        messageId: id
-      });
-      // Send one over the websocket to other users
-      this.$socket.sendObj({
-        action: "QUEUE",
-        message: {
-          id: this.$store.getters.getUser("meetingID"),
+      if (this.$store.state.hands.filter((h) => h.owner === true).length < 1) {
+        this.$store.dispatch("addHand", {
           emoji: "hand",
           username: `${this.$store.getters.getUser("name")} raised their hand`,
           img: this.$store.getters.getUser("avatar"),
-          messageId: id
-        }
-      });
+          messageId: id,
+          owner: true,
+        });
+        // Send one over the websocket to other users
+        this.$socket.sendObj({
+          action: "QUEUE",
+          message: {
+            id: this.$store.getters.getUser("meetingID"),
+            emoji: "hand",
+            username: `${this.$store.getters.getUser("name")} raised their hand`,
+            img: this.$store.getters.getUser("avatar"),
+            messageId: id,
+          },
+        });
+      }
     },
     closeDropdown() {
       this.$store.dispatch("closeDropdown", "reactions");
-    }
-  }
+    },
+  },
 };
 </script>
 
