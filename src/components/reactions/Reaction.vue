@@ -19,7 +19,7 @@ export default {
   methods: {
     sendMessage(emoji) {
       this.$store.dispatch("closeDropdown", "reactions");
-      if (this.$store.state.messages.filter((h) => h.owner === true).length < 3) {
+      if (this.$store.state.messages.filter((h) => h.owner === true).length < 1) {
         this.$store.dispatch("addMessage", {
           messageId: generateUUID(),
           emoji: emoji,
