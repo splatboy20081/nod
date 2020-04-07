@@ -5,22 +5,25 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
+    // TODO - SWITCH BACK TO PROD
+    extensionID: "oikgofeboedgfkaacpfepbfmgdalabej", //PROD: oikgofeboedgfkaacpfepbfmgdalabej / DEV: cpdaoleiojomipifgjmkjjkmfecanfdo
     userData: {},
     messages: [],
     hands: [],
     reactions: false,
     settings: false,
     updateAvailable: false,
-    updateChecked: false
+    updateChecked: false,
+    visible: true,
   },
 
   getters: {
-    getAsset: state => key => {
+    getAsset: (state) => (key) => {
       return state.userData.assets[key];
     },
-    getUser: state => key => {
+    getUser: (state) => (key) => {
       return state.userData[key];
-    }
+    },
   },
 
   mutations: {
@@ -28,13 +31,13 @@ export default new Vuex.Store({
       state.messages.unshift(data);
     },
     removeMessage(state, messageData) {
-      state.messages = state.messages.filter(message => message != messageData);
+      state.messages = state.messages.filter((message) => message != messageData);
     },
     addHand(state, data) {
       state.hands.unshift(data);
     },
     removeHand(state, id) {
-      state.hands = state.hands.filter(hand => hand.messageId != id);
+      state.hands = state.hands.filter((hand) => hand.messageId != id);
     },
     addUserData(state, data) {
       state.userData = data;
@@ -50,7 +53,10 @@ export default new Vuex.Store({
     },
     setUpdateChecked(state, boolean) {
       state.updateChecked = boolean;
-    }
+    },
+    setVisible(state, boolean) {
+      state.visible = boolean;
+    },
   },
 
   actions: {
@@ -83,6 +89,9 @@ export default new Vuex.Store({
     },
     setUpdateChecked(context, boolean) {
       context.commit("setUpdateChecked", boolean);
-    }
-  }
+    },
+    setVisible(context, boolean) {
+      context.commit("setVisible", boolean);
+    },
+  },
 });

@@ -23,7 +23,7 @@ const injectScript = (file_path, type = "script", tag = "html", text = "") => {
 (async () => {
   // Wait until in call
   while (document.querySelector(".d7iDfe") !== null) {
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, 500));
   }
 
   // Create wrapper for Vue App
@@ -48,7 +48,8 @@ const injectScript = (file_path, type = "script", tag = "html", text = "") => {
           "love" : "${chrome.runtime.getURL("img/love.gif")}",
           "hand" : "${chrome.runtime.getURL("img/hand.gif")}",
           "down" : "${chrome.runtime.getURL("img/down.png")}",
-          "handStatic" : "${chrome.runtime.getURL("img/hand.png")}"
+          "handStatic" : "${chrome.runtime.getURL("img/hand.png")}",
+          "notification" : "${chrome.runtime.getURL("img/notification.png")}"
         }`
   );
 })();

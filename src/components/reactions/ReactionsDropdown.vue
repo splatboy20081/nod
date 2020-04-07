@@ -5,18 +5,15 @@
     <Reaction emoji="love" text="Wow" label="Send excited face emoji" />
     <Reaction emoji="laugh" text="LOL!" label="Send laughing emoji" />
     <Reaction emoji="clap" text="Well Done!" label="Send clapping emoji" />
-    <CheckUpdate />
   </div>
 </template>
 
 <script>
 import Reaction from "./Reaction";
-import CheckUpdate from "./CheckUpdate";
 export default {
   components: {
     Reaction,
-    CheckUpdate
-  }
+  },
 };
 </script>
 
@@ -29,7 +26,8 @@ export default {
   background-color: white;
   border-top: 1px solid #eee;
   border-radius: 0 0 8px 0;
-  width: 173px;
+  width: 240px;
   box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302), 0 6px 6px 2px rgba(60, 64, 67, 0.149);
+  padding-bottom: 10px;
 }
 </style>

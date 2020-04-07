@@ -13,7 +13,7 @@ import ReactionsDropdown from "../ReactionsDropdown";
 
 export default {
   components: {
-    ReactionsDropdown
+    ReactionsDropdown,
   },
   methods: {
     openReactions: function() {
@@ -21,8 +21,8 @@ export default {
     },
     closeReactions: function() {
       this.$store.dispatch("closeDropdown", "reactions");
-    }
-  }
+    },
+  },
 };
 </script>
 

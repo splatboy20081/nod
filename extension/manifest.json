@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Nod - Reactions for Google Meet",
-  "version": "2.2.9",
+  "version": "2.3.1",
   "description": "Quick emoji reactions for muted team members",
   "content_scripts": [
     {
@@ -19,5 +19,6 @@
   },
   "externally_connectable": {
     "matches": ["*://meet.google.com/**-**-**"]
-  }
+  },
+  "optional_permissions": ["notifications", "*://meet.google.com/**-**-**"]
 }

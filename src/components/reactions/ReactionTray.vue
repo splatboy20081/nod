@@ -4,8 +4,8 @@
       <ReactionsButton />
       <div class="qO3Z3c"></div>
       <HandUpButton />
-      <!-- <div class="qO3Z3c"></div>
-      <SettingsButton /> -->
+      <div class="qO3Z3c"></div>
+      <SettingsButton />
     </div>
   </div>
 </template>
@@ -19,13 +19,13 @@ export default {
   components: {
     HandUpButton,
     ReactionsButton,
-    SettingsButton
+    SettingsButton,
   },
   computed: {
     trayOpen() {
       return this.$store.state.reactions || this.$store.state.settings;
-    }
-  }
+    },
+  },
 };
 </script>
 

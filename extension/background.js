@@ -18,19 +18,23 @@ chrome.runtime.onMessageExternal.addListener(function(request, sender, sendRespo
       }
     });
   }
-  // if (request.type === "notification") {
-  //   chrome.permissions.request(
-  //     {
-  //       permissions: ["notifications"],
-  //       origins: ["*://meet.google.com/**-**-**"]
-  //     },
-  //     function(granted) {
-  //       if (granted) {
-  //         console.log("Permissions Granted");
-  //       } else {
-  //         console.log("Permissions Denied");
-  //       }
-  //     }
-  //   );
-  // }
+  if (request.type === "notification") {
+    chrome.permissions.request(
+      {
+        permissions: ["notifications"],
+        origins: ["*://meet.google.com/**-**-**"],
+      },
+      function(granted) {
+        if (granted) {
+          sendResponse({ permissions: true });
+        } else {
+          sendResponse({ permissions: false });
+        }
+      }
+    );
+  }
+
+  if (request.type === "displayNotification") {
+    chrome.notifications.create("", request.options);
+  }
 });
