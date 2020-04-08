@@ -15,6 +15,7 @@ export default new Vuex.Store({
     updateAvailable: false,
     updateChecked: false,
     visible: true,
+    tone: 0,
   },
 
   getters: {
@@ -57,6 +58,9 @@ export default new Vuex.Store({
     setVisible(state, boolean) {
       state.visible = boolean;
     },
+    setTone(state, int) {
+      state.tone = int;
+    },
   },
 
   actions: {
@@ -92,6 +96,9 @@ export default new Vuex.Store({
     },
     setVisible(context, boolean) {
       context.commit("setVisible", boolean);
+    },
+    setTone(context, int) {
+      context.commit("setTone", int);
     },
   },
 });

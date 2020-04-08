@@ -16,7 +16,7 @@
         />
         <path d="M0 0h24v24H0z" fill="none" />
       </svg>
-      <a v-if="updateAvailable" @click="reload()">Click to update</a>
+      <a v-if="updateAvailable" @click="reload()" @keyup.enter="reload()" tabindex="0" aria-label="Reload page to update" role="button">Click to update</a>
 
       <!-- If no update is available -->
       <svg v-if="noUpdateAvailable" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" class="settings-icon faded">

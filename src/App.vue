@@ -131,6 +131,6 @@ export default {
 
 /* Styles for Meet */
 .pHsCke {
-  padding-left: 180px !important;
+  padding-left: 250px !important;
 }
 </style>

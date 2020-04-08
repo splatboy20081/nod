@@ -1,7 +1,7 @@
 <template>
   <div class="nod-message">
     <div class="nod-emoji-wrapper">
-      <img :src="$store.getters.getAsset(emoji)" :alt="emoji" class="nod-emoji" />
+      <img :src="getEmoji" :alt="emoji" class="nod-emoji" />
     </div>
     <img :src="img" :alt="username" class="nod-avatar" />
     {{ username }}
@@ -10,11 +10,31 @@
 
 <script>
 export default {
+  computed: {
+    getEmoji() {
+      if (this.tone >= 0) {
+        switch (this.emoji) {
+          case "thumb":
+            return this.$store.getters.getAsset("thumbTones")[this.tone];
+            break;
+          case "clap":
+            return this.$store.getters.getAsset("clapTones")[this.tone];
+            break;
+          default:
+            return this.$store.getters.getAsset(this.emoji);
+        }
+      } else {
+        return this.$store.getters.getAsset(this.emoji);
+      }
+    },
+  },
+
   props: {
     username: String,
     emoji: String,
-    img: String
-  }
+    img: String,
+    tone: Number,
+  },
 };
 </script>
 

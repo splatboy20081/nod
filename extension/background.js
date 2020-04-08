@@ -35,6 +35,7 @@ chrome.runtime.onMessageExternal.addListener(function(request, sender, sendRespo
   }
 
   if (request.type === "displayNotification") {
+    console.log(request.options);
     chrome.notifications.create("", request.options);
   }
 });

@@ -2,7 +2,7 @@
   <div id="nodBtn" class="tray-button-outer" tabindex="0" @mouseover="openReactions" @mouseleave="closeReactions" @keyup.enter="openReactions" @keyup.esc="closeReactions">
     <a class="uArJ5e UQuaGc kCyAyd kW31ib foXzLb tray-button" tabindex="-1" aria-label="Open Nod extension" role="button">
       <div class="e19J0b CeoRYc"></div>
-      <img :src="$store.getters.getAsset('thumb')" style="height: 42px;" />
+      <img :src="getThumb" style="height: 42px;" />
       <ReactionsDropdown v-if="this.$store.state.reactions" />
     </a>
   </div>
@@ -14,6 +14,11 @@ import ReactionsDropdown from "../ReactionsDropdown";
 export default {
   components: {
     ReactionsDropdown,
+  },
+  computed: {
+    getThumb() {
+      return this.$store.getters.getAsset("thumbTones")[this.$store.state.tone];
+    },
   },
   methods: {
     openReactions: function() {
