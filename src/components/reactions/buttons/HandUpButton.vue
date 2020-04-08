@@ -2,7 +2,7 @@
   <div class="tray-button-outer" tabindex="0" @focus="closeDropdown" @keyup.enter="sendHand()" @click="sendHand()">
     <a class="uArJ5e UQuaGc kCyAyd kW31ib foXzLb tray-button" tabindex="-1" aria-label="Raise your hand" role="button">
       <div class="e19J0b CeoRYc"></div>
-      <img :src="$store.getters.getAsset('handStatic')" style="height: 32px;" />
+      <img :src="getHand" style="height: 32px;" />
     </a>
   </div>
 </template>
@@ -11,6 +11,11 @@
 import { generateUUID } from "../../../utils/index";
 
 export default {
+  computed: {
+    getHand() {
+      return this.$store.getters.getAsset("handTones")[this.$store.state.tone];
+    },
+  },
   methods: {
     sendHand() {
       // Close dropdown
@@ -25,6 +30,7 @@ export default {
           img: this.$store.getters.getUser("avatar"),
           messageId: id,
           owner: true,
+          tone: this.$store.state.tone,
         });
         // Send one over the websocket to other users
         this.$socket.sendObj({
@@ -35,6 +41,7 @@ export default {
             username: `${this.$store.getters.getUser("name")} raised their hand`,
             img: this.$store.getters.getUser("avatar"),
             messageId: id,
+            tone: this.$store.state.tone,
           },
         });
       }

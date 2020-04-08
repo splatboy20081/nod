@@ -1,7 +1,7 @@
 <template>
   <div class="dropdown-outer" @click="sendMessage(emoji)" @keyup.enter="sendMessage(emoji)" tabindex="0" :aria-label="label" role="button">
-    <div class="dropdown-item" tabindex="-1">
-      <img class="emoji" :src="$store.getters.getAsset(emoji)" />
+    <div class="dropdown-item" tabindex="-1" :class="{ faded: !canPost }">
+      <img class="emoji" :src="getToneImg" />
       {{ text }}
     </div>
   </div>
@@ -16,16 +16,32 @@ export default {
     text: String,
     label: String,
   },
+
+  computed: {
+    canPost() {
+      return this.$store.state.messages.filter((h) => h.owner === true).length < 1;
+    },
+    getToneImg() {
+      if (this.emoji == "thumb") {
+        return this.$store.getters.getAsset("thumbTones")[this.$store.state.tone];
+      } else if (this.emoji == "clap") {
+        return this.$store.getters.getAsset("clapTones")[this.$store.state.tone];
+      } else {
+        return this.$store.getters.getAsset(this.emoji);
+      }
+    },
+  },
   methods: {
     sendMessage(emoji) {
       this.$store.dispatch("closeDropdown", "reactions");
-      if (this.$store.state.messages.filter((h) => h.owner === true).length < 1) {
+      if (this.canPost) {
         this.$store.dispatch("addMessage", {
           messageId: generateUUID(),
           emoji: emoji,
           username: this.$store.getters.getUser("name"),
           img: this.$store.getters.getUser("avatar"),
           owner: true,
+          tone: this.$store.state.tone,
         });
 
         this.$socket.sendObj({
@@ -35,6 +51,7 @@ export default {
             emoji: emoji,
             username: this.$store.getters.getUser("name"),
             img: this.$store.getters.getUser("avatar"),
+            tone: this.$store.state.tone,
           },
         });
       }
@@ -59,6 +76,14 @@ export default {
   position: relative;
   &:hover {
     background-color: #00796b0d;
+  }
+}
+
+.faded {
+  opacity: 0.3;
+  cursor: default;
+  &:hover {
+    background-color: white;
   }
 }
 

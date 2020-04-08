@@ -1,8 +1,8 @@
 <template>
   <div>
     <transition-group name="fading" class="nod-message-wrapper">
-      <Message v-for="msg in messages" :key="msg.messageId" :emoji="msg.emoji" :username="msg.username" :img="msg.img" />
-      <Hand v-for="hand in hands" :key="hand.messageId" :username="hand.username" :img="hand.img" :messageId="hand.messageId" />
+      <Message v-for="msg in messages" :key="msg.messageId" :emoji="msg.emoji" :username="msg.username" :img="msg.img" :tone="msg.tone" />
+      <Hand v-for="hand in hands" :key="hand.messageId" :username="hand.username" :img="hand.img" :messageId="hand.messageId" :tone="hand.tone" />
     </transition-group>
   </div>
 </template>
@@ -36,6 +36,7 @@ export default {
             username: d.message.username,
             img: d.message.img,
             owner: false,
+            tone: d.message.tone,
           });
           break;
         case "QUEUE":
@@ -44,6 +45,7 @@ export default {
             username: d.message.username,
             img: d.message.img,
             owner: false,
+            tone: d.message.tone,
           });
 
           if (this.$store.state.visible == false && localStorage.getItem("notificationStatus") == "true") {
@@ -52,7 +54,7 @@ export default {
               options: {
                 title: "Notification from Nod",
                 message: d.message.username,
-                iconUrl: `chrome-extension://${this.$store.state.extensionID}/img/hand.png`,
+                iconUrl: d.message.tone ? this.$store.getters.getAsset("handTones")[d.message.tone] : this.$store.getters.getAsset("handStatic"),
                 type: "basic",
               },
             });

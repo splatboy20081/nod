@@ -41,15 +41,39 @@ const injectScript = (file_path, type = "script", tag = "html", text = "") => {
     "script",
     "html",
     `{
-          "thumb" : "${chrome.runtime.getURL("img/thumb.png")}",
-          "confused" : "${chrome.runtime.getURL("img/confused.gif")}",
-          "clap" : "${chrome.runtime.getURL("img/clap.gif")}",
-          "laugh" : "${chrome.runtime.getURL("img/laugh.gif")}",
-          "love" : "${chrome.runtime.getURL("img/love.gif")}",
-          "hand" : "${chrome.runtime.getURL("img/hand.gif")}",
-          "down" : "${chrome.runtime.getURL("img/down.png")}",
-          "handStatic" : "${chrome.runtime.getURL("img/hand.png")}",
-          "notification" : "${chrome.runtime.getURL("img/notification.png")}"
-        }`
+      "thumb": "${chrome.runtime.getURL("img/thumb.png")}",
+      "confused": "${chrome.runtime.getURL("img/confused.gif")}",
+      "clap": "${chrome.runtime.getURL("img/clap.gif")}",
+      "laugh": "${chrome.runtime.getURL("img/laugh.gif")}",
+      "love": "${chrome.runtime.getURL("img/love.gif")}",
+      "hand": "${chrome.runtime.getURL("img/hand.gif")}",
+      "down": "${chrome.runtime.getURL("img/down.png")}",
+      "handStatic": "${chrome.runtime.getURL("img/hand.png")}",
+      "notification": "${chrome.runtime.getURL("img/notification.png")}",
+      "thumbTones": [
+        "${chrome.runtime.getURL("img/tones/0/thumb.png")}",
+        "${chrome.runtime.getURL("img/tones/1/thumb.png")}",
+        "${chrome.runtime.getURL("img/tones/2/thumb.png")}",
+        "${chrome.runtime.getURL("img/tones/3/thumb.png")}",
+        "${chrome.runtime.getURL("img/tones/4/thumb.png")}",
+        "${chrome.runtime.getURL("img/tones/5/thumb.png")}"
+      ],
+      "handTones": [
+        "${chrome.runtime.getURL("img/tones/0/hand.png")}",
+        "${chrome.runtime.getURL("img/tones/1/hand.png")}",
+        "${chrome.runtime.getURL("img/tones/2/hand.png")}",
+        "${chrome.runtime.getURL("img/tones/3/hand.png")}",
+        "${chrome.runtime.getURL("img/tones/4/hand.png")}",
+        "${chrome.runtime.getURL("img/tones/5/hand.png")}"
+      ],
+      "clapTones": [
+        "${chrome.runtime.getURL("img/tones/0/clap.gif")}",
+        "${chrome.runtime.getURL("img/tones/1/clap.gif")}",
+        "${chrome.runtime.getURL("img/tones/2/clap.gif")}",
+        "${chrome.runtime.getURL("img/tones/3/clap.gif")}",
+        "${chrome.runtime.getURL("img/tones/4/clap.gif")}",
+        "${chrome.runtime.getURL("img/tones/5/clap.gif")}"
+      ]
+    }`
   );
 })();

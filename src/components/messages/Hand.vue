@@ -2,7 +2,7 @@
   <div @mouseenter.self="mouseIn" @mouseleave.self="mouseOut" @click="removeHand(messageId)" class="nod-message">
     <div class="nod-emoji-wrapper">
       <img v-if="hover" :src="$store.getters.getAsset('down')" alt="Remove icon" class="nod-emoji" />
-      <img v-else :src="$store.getters.getAsset('hand')" alt="Hands up emoji" class="nod-emoji" />
+      <img v-else :src="getEmoji" alt="Hands up emoji" class="nod-emoji" />
     </div>
     <img :src="img" :alt="username" class="nod-avatar" />
     {{ username }}
@@ -11,14 +11,24 @@
 
 <script>
 export default {
+  computed: {
+    getEmoji() {
+      if (this.tone >= 0) {
+        return this.$store.getters.getAsset("handTones")[this.tone];
+      } else {
+        return this.$store.getters.getAsset("hand");
+      }
+    },
+  },
   props: {
     username: String,
     img: String,
-    messageId: String
+    messageId: String,
+    tone: Number,
   },
   data() {
     return {
-      hover: false
+      hover: false,
     };
   },
   methods: {
@@ -36,11 +46,11 @@ export default {
         action: "REMOVE",
         message: {
           id: this.$store.getters.getUser("meetingID"),
-          messageId: key
-        }
+          messageId: key,
+        },
       });
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -69,8 +79,7 @@ export default {
 }
 
 .nod-emoji {
-  width: 80%;
-  max-width: 42px;
+  max-width: 26px;
   transition: all 0.3s ease;
 }
 
