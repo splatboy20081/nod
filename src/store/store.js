@@ -6,7 +6,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     // TODO - SWITCH BACK TO PROD
-    extensionID: "cpdaoleiojomipifgjmkjjkmfecanfdo", //PROD: oikgofeboedgfkaacpfepbfmgdalabej / DEV: cpdaoleiojomipifgjmkjjkmfecanfdo
+    extensionID: "oikgofeboedgfkaacpfepbfmgdalabej", //PROD: oikgofeboedgfkaacpfepbfmgdalabej / DEV: cpdaoleiojomipifgjmkjjkmfecanfdo
     userData: {},
     messages: [],
     hands: [],
