@@ -47,6 +47,10 @@ export default {
           }
         });
 
+        this.$gtag.event("click", {
+          event_category: "Reactions",
+          event_label: "Hand Up",
+          event_value: this.$store.state.tone
         });
       }
     },

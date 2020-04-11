@@ -48,6 +48,10 @@ export default {
             tone: this.$store.state.tone
           }
         });
+        this.$gtag.event("click", {
+          event_category: "Reactions",
+          event_label: emoji,
+          event_value: this.$store.state.tone
         });
       }
     }

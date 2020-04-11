@@ -28,6 +28,7 @@ const injectScript = (file_path, type = "script", tag = "html") => {
   document.body.prepend(app);
 
   // Inject script into page
+  injectScript("https://www.googletagmanager.com/gtag/js?id=UA-162154532-1", "script", "head");
   injectScript(chrome.runtime.getURL("dist/app.css"), "link", "head");
   injectScript(chrome.runtime.getURL("dist/app.js"), "script", "html");
   injectScript(chrome.runtime.getURL("dist/chunk-vendors.js"), "script", "html");
