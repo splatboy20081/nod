@@ -14,22 +14,16 @@ export default {
   props: {
     emoji: String,
     text: String,
-    label: String,
+    label: String
   },
 
   computed: {
     canPost() {
-      return this.$store.state.messages.filter((h) => h.owner === true).length < 1;
+      return this.$store.state.messages.filter(h => h.owner === true).length < 1;
     },
     getToneImg() {
-      if (this.emoji == "thumb") {
-        return this.$store.getters.getAsset("thumbTones")[this.$store.state.tone];
-      } else if (this.emoji == "clap") {
-        return this.$store.getters.getAsset("clapTones")[this.$store.state.tone];
-      } else {
-        return this.$store.getters.getAsset(this.emoji);
-      }
-    },
+      return `chrome-extension://${this.$store.state.extensionID}/img/tones/${this.$store.state.tone}/${this.emoji}.gif`;
+    }
   },
   methods: {
     sendMessage(emoji) {
@@ -41,7 +35,7 @@ export default {
           username: this.$store.getters.getUser("name"),
           img: this.$store.getters.getUser("avatar"),
           owner: true,
-          tone: this.$store.state.tone,
+          tone: this.$store.state.tone
         });
 
         this.$socket.sendObj({
@@ -51,12 +45,17 @@ export default {
             emoji: emoji,
             username: this.$store.getters.getUser("name"),
             img: this.$store.getters.getUser("avatar"),
-            tone: this.$store.state.tone,
-          },
+            tone: this.$store.state.tone
+          }
+        });
+        this.$gtag.event("click", {
+          event_category: "Reactions",
+          event_label: emoji,
+          event_value: this.$store.state.tone
         });
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

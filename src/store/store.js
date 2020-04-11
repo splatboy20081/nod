@@ -15,16 +15,13 @@ export default new Vuex.Store({
     updateAvailable: false,
     updateChecked: false,
     visible: true,
-    tone: 0,
+    tone: 0
   },
 
   getters: {
-    getAsset: (state) => (key) => {
-      return state.userData.assets[key];
-    },
-    getUser: (state) => (key) => {
+    getUser: state => key => {
       return state.userData[key];
-    },
+    }
   },
 
   mutations: {
@@ -32,13 +29,13 @@ export default new Vuex.Store({
       state.messages.unshift(data);
     },
     removeMessage(state, messageData) {
-      state.messages = state.messages.filter((message) => message != messageData);
+      state.messages = state.messages.filter(message => message != messageData);
     },
     addHand(state, data) {
       state.hands.unshift(data);
     },
     removeHand(state, id) {
-      state.hands = state.hands.filter((hand) => hand.messageId != id);
+      state.hands = state.hands.filter(hand => hand.messageId != id);
     },
     addUserData(state, data) {
       state.userData = data;
@@ -60,7 +57,7 @@ export default new Vuex.Store({
     },
     setTone(state, int) {
       state.tone = int;
-    },
+    }
   },
 
   actions: {
@@ -99,6 +96,6 @@ export default new Vuex.Store({
     },
     setTone(context, int) {
       context.commit("setTone", int);
-    },
-  },
+    }
+  }
 });

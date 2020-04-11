@@ -1,7 +1,7 @@
 <template>
   <div id="nodBtn" class="tray-button-outer" tabindex="0" @mouseover="openReactions" @mouseleave="closeReactions" @keyup.enter="openReactions" @keyup.esc="closeReactions">
-    <a class="uArJ5e UQuaGc kCyAyd kW31ib foXzLb tray-button" tabindex="-1" aria-label="Open Nod extension" role="button">
-      <div class="e19J0b CeoRYc"></div>
+    <a class="tray-button" tabindex="-1" aria-label="Open Nod extension" role="button">
+      <div class="tray-button-bg"></div>
       <img :src="getThumb" style="height: 42px;" />
       <ReactionsDropdown v-if="this.$store.state.reactions" />
     </a>
@@ -13,12 +13,12 @@ import ReactionsDropdown from "../ReactionsDropdown";
 
 export default {
   components: {
-    ReactionsDropdown,
+    ReactionsDropdown
   },
   computed: {
     getThumb() {
-      return this.$store.getters.getAsset("thumbTones")[this.$store.state.tone];
-    },
+      return `chrome-extension://${this.$store.state.extensionID}/img/tones/${this.$store.state.tone}/thumb.gif`;
+    }
   },
   methods: {
     openReactions: function() {
@@ -26,8 +26,8 @@ export default {
     },
     closeReactions: function() {
       this.$store.dispatch("closeDropdown", "reactions");
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -36,11 +36,5 @@ export default {
   &:focus > .tray-button {
     background-color: rgba(2, 191, 165, 0.15);
   }
-}
-
-.tray-button {
-  display: flex;
-  overflow: visible !important;
-  padding: 0 10px;
 }
 </style>

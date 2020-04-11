@@ -17,8 +17,8 @@ export default {
     setTone(number) {
       this.$store.dispatch("setTone", number);
       localStorage.setItem("nod-skinTone", number);
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -38,8 +38,8 @@ export default {
 }
 
 .tone-picker {
-  width: 25px;
-  height: 25px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   margin: 0 2px;
   border: 3px solid white;
