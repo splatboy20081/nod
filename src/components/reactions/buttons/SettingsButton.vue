@@ -20,7 +20,7 @@ import SettingsDropdown from "../../settings/SettingsDropdown";
 
 export default {
   components: {
-    SettingsDropdown,
+    SettingsDropdown
   },
   methods: {
     toggleDropdown() {
@@ -32,8 +32,8 @@ export default {
     },
     closeDropdown() {
       this.$store.dispatch("closeDropdown", "settings");
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -46,5 +46,6 @@ export default {
 .tray-button {
   display: flex;
   overflow: visible !important;
+  padding: 0 10px;
 }
 </style>

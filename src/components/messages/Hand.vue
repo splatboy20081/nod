@@ -1,7 +1,7 @@
 <template>
   <div @mouseenter.self="mouseIn" @mouseleave.self="mouseOut" @click="removeHand(messageId)" class="nod-message">
     <div class="nod-emoji-wrapper">
-      <img v-if="hover" :src="$store.getters.getAsset('down')" alt="Remove icon" class="nod-emoji" />
+      <img v-if="hover" :src="getCloseButton" alt="Remove icon" class="nod-emoji" />
       <img v-else :src="getEmoji" alt="Hands up emoji" class="nod-emoji" />
     </div>
     <img :src="img" :alt="username" class="nod-avatar" />
@@ -14,21 +14,24 @@ export default {
   computed: {
     getEmoji() {
       if (this.tone >= 0) {
-        return this.$store.getters.getAsset("handTones")[this.tone];
+        return `chrome-extension://${this.$store.state.extensionID}/img/tones/${this.tone}/hand.gif`;
       } else {
-        return this.$store.getters.getAsset("hand");
+        return `chrome-extension://${this.$store.state.extensionID}/img/tones/0/hand.gif`;
       }
     },
+    getCloseButton() {
+      return `chrome-extension://${this.$store.state.extensionID}/img/down.png`;
+    }
   },
   props: {
     username: String,
     img: String,
     messageId: String,
-    tone: Number,
+    tone: Number
   },
   data() {
     return {
-      hover: false,
+      hover: false
     };
   },
   methods: {
@@ -46,11 +49,11 @@ export default {
         action: "REMOVE",
         message: {
           id: this.$store.getters.getUser("meetingID"),
-          messageId: key,
-        },
+          messageId: key
+        }
       });
-    },
-  },
+    }
+  }
 };
 </script>
 

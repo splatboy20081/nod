@@ -1,6 +1,6 @@
 <template>
   <div class="explainer">
-    <img :src="$store.getters.getAsset('notification')" style="width: 200px;" />
+    <img :src="notificationImg" style="width: 200px;" />
     <div class="explainer-body">
       <div class="nod-pill">New</div>
       <div class="explainer-title"><b>Notifications</b></div>
@@ -10,13 +10,19 @@
 </template>
 
 <script>
-export default {};
+export default {
+  computed: {
+    notificationImg() {
+      return `chrome-extension://${this.$store.state.extensionID}/img/notification.png`;
+    }
+  }
+};
 </script>
 
 <style lang="scss" scoped>
 .explainer {
   position: absolute;
-  left: 250px;
+  left: 270px;
   top: -40px;
   background-color: white;
   border-radius: 5px;

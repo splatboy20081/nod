@@ -15,7 +15,7 @@ import { generateUUID, sendNotification } from "../../utils";
 export default {
   components: {
     Message,
-    Hand,
+    Hand
   },
   computed: {
     messages() {
@@ -23,7 +23,7 @@ export default {
     },
     hands() {
       return this.$store.state.hands;
-    },
+    }
   },
   created: function() {
     this.$options.sockets.onmessage = ({ data }) => {
@@ -36,7 +36,7 @@ export default {
             username: d.message.username,
             img: d.message.img,
             owner: false,
-            tone: d.message.tone,
+            tone: d.message.tone
           });
           break;
         case "QUEUE":
@@ -45,7 +45,7 @@ export default {
             username: d.message.username,
             img: d.message.img,
             owner: false,
-            tone: d.message.tone,
+            tone: d.message.tone
           });
 
           if (this.$store.state.visible == false && localStorage.getItem("notificationStatus") == "true") {
@@ -54,9 +54,11 @@ export default {
               options: {
                 title: "Notification from Nod",
                 message: d.message.username,
-                iconUrl: d.message.tone ? this.$store.getters.getAsset("handTones")[d.message.tone] : this.$store.getters.getAsset("handStatic"),
-                type: "basic",
-              },
+                iconUrl: d.message.tone
+                  ? `chrome-extension://${this.$store.state.extensionID}/img/tones/${d.message.tone}/hand.gif`
+                  : `chrome-extension://${this.$store.state.extensionID}/img/tones/0/hand.gif`,
+                type: "basic"
+              }
             });
           }
           break;
@@ -65,7 +67,7 @@ export default {
           break;
       }
     };
-  },
+  }
 };
 </script>
 

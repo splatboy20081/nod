@@ -37,8 +37,8 @@ export default {
   components: {
     NotificationsButton,
     UpdateButton,
-    SkinToneSelector,
-  },
+    SkinToneSelector
+  }
 };
 </script>
 
@@ -50,7 +50,7 @@ export default {
   background-color: white;
   border-top: 1px solid #eee;
   border-radius: 0 0 8px 0;
-  width: 240px;
+  width: 260px;
   box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302), 0 6px 6px 2px rgba(60, 64, 67, 0.149);
   padding-bottom: 10px;
 }
