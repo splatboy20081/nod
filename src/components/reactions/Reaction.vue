@@ -23,6 +23,13 @@ export default {
     },
     getToneImg() {
       return `chrome-extension://${this.$store.state.extensionID}/img/tones/${this.$store.state.tone}/${this.emoji}.gif`;
+    },
+    getUsername() {
+      if (this.$store.state.isFullName) {
+        return this.$store.getters.getUser("fullName");
+      } else {
+        return this.$store.getters.getUser("name");
+      }
     }
   },
   methods: {
@@ -32,7 +39,7 @@ export default {
         this.$store.dispatch("addMessage", {
           messageId: generateUUID(),
           emoji: emoji,
-          username: this.$store.getters.getUser("name"),
+          username: this.getUsername,
           img: this.$store.getters.getUser("avatar"),
           owner: true,
           tone: this.$store.state.tone
@@ -43,7 +50,7 @@ export default {
           message: {
             id: this.$store.getters.getUser("meetingID"),
             emoji: emoji,
-            username: this.$store.getters.getUser("name"),
+            username: this.getUsername,
             img: this.$store.getters.getUser("avatar"),
             tone: this.$store.state.tone
           }

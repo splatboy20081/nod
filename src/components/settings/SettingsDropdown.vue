@@ -2,6 +2,8 @@
   <div class="dropdown">
     <SkinToneSelector />
     <div class="kCtYwe" role="separator"></div>
+    <NameDisplay />
+    <div class="kCtYwe" role="separator"></div>
 
     <NotificationsButton />
     <UpdateButton />
@@ -33,11 +35,13 @@
 import NotificationsButton from "./NotificationsButton";
 import UpdateButton from "./UpdateButton";
 import SkinToneSelector from "./SkinToneSelector";
+import NameDisplay from "./NameDisplay";
 export default {
   components: {
     NotificationsButton,
     UpdateButton,
-    SkinToneSelector
+    SkinToneSelector,
+    NameDisplay
   }
 };
 </script>

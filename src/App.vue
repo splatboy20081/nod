@@ -37,10 +37,16 @@ export default {
       let data = {
         meetingID: document.querySelector("[data-unresolved-meeting-id]").getAttribute("data-unresolved-meeting-id"),
         name: userData[6].split(" ")[0],
+        fullName: userData[6],
         team: userData[28],
         avatar: userData[5]
       };
       this.$store.dispatch("addUserData", data);
+
+      const localFullName = localStorage.getItem("nod-isFullName") === "true";
+      if (localFullName) {
+        this.$store.dispatch("setFullName", localFullName);
+      }
     },
     websocketInit() {
       // Display extension
@@ -65,7 +71,7 @@ export default {
         this.$socket.sendObj({ route: "ping" });
       };
 
-      let keepAlive = setInterval(ping, 60000 * 5);
+      let keepAlive = setInterval(ping, 60000 * 9);
     },
 
     setupListeners() {

@@ -14,8 +14,13 @@ export default {
   computed: {
     getHand() {
       return `chrome-extension://${this.$store.state.extensionID}/img/tones/${this.$store.state.tone}/hand.gif`;
-
-      // return this.$store.getters.getAsset("handTones")[this.$store.state.tone];
+    },
+    getUsername() {
+      if (this.$store.state.isFullName) {
+        return this.$store.getters.getUser("fullName");
+      } else {
+        return this.$store.getters.getUser("name");
+      }
     }
   },
   methods: {
@@ -28,7 +33,7 @@ export default {
       if (this.$store.state.hands.filter(h => h.owner === true).length < 1) {
         this.$store.dispatch("addHand", {
           emoji: "hand",
-          username: `${this.$store.getters.getUser("name")} raised their hand`,
+          username: `${this.getUsername} raised their hand`,
           img: this.$store.getters.getUser("avatar"),
           messageId: id,
           owner: true,
@@ -40,7 +45,7 @@ export default {
           message: {
             id: this.$store.getters.getUser("meetingID"),
             emoji: "hand",
-            username: `${this.$store.getters.getUser("name")} raised their hand`,
+            username: `${this.getUsername} raised their hand`,
             img: this.$store.getters.getUser("avatar"),
             messageId: id,
             tone: this.$store.state.tone

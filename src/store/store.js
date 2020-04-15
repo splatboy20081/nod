@@ -15,6 +15,7 @@ export default new Vuex.Store({
     updateAvailable: false,
     updateChecked: false,
     visible: true,
+    isFullName: false,
     tone: 0
   },
 
@@ -57,6 +58,9 @@ export default new Vuex.Store({
     },
     setTone(state, int) {
       state.tone = int;
+    },
+    setFullName(state, boolean) {
+      state.isFullName = boolean;
     }
   },
 
@@ -96,6 +100,9 @@ export default new Vuex.Store({
     },
     setTone(context, int) {
       context.commit("setTone", int);
+    },
+    setFullName(context, boolean) {
+      context.commit("setFullName", boolean);
     }
   }
 });
