@@ -10,4 +10,13 @@
 export default {};
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.dropdown-outer {
+  flex-basis: 100%;
+  margin: 0 5px;
+  border-radius: 8px;
+  &:hover {
+    background-color: #00796b0d;
+  }
+}
+</style>
