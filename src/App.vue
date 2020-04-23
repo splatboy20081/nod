@@ -14,16 +14,16 @@ export default {
   name: "App",
   data() {
     return {
-      loaded: false
+      loaded: false,
     };
   },
   components: {
     ReactionTray,
-    MessageWrapper
+    MessageWrapper,
   },
   created: function() {
     this.getData();
-    this.$options.sockets.onopen = data => {
+    this.$options.sockets.onopen = (data) => {
       this.websocketInit();
       this.setupListeners();
     };
@@ -39,7 +39,7 @@ export default {
         name: userData[6].split(" ")[0],
         fullName: userData[6],
         team: userData[28],
-        avatar: userData[5]
+        avatar: userData[5],
       };
       this.$store.dispatch("addUserData", data);
 
@@ -57,8 +57,8 @@ export default {
         route: "join",
         data: {
           id: this.$store.getters.getUser("meetingID"),
-          team: this.$store.getters.getUser("team")
-        }
+          team: this.$store.getters.getUser("team"),
+        },
       });
 
       // Send console message
@@ -102,25 +102,25 @@ export default {
     },
 
     async setupDestroyListener() {
-      window.addEventListener("beforeunload", event => {
+      window.addEventListener("beforeunload", (event) => {
         this.$socket.sendObj({
           route: "disconnect",
-          data: { id: this.$store.getters.getUser("meetingID") }
+          data: { id: this.$store.getters.getUser("meetingID") },
         });
       });
 
       // wait for meet to relay call ended message
       while (document.querySelector("[data-call-ended='true']") == null) {
-        await new Promise(r => setTimeout(r, 200));
+        await new Promise((r) => setTimeout(r, 200));
       }
       this.loaded = false;
       this.$socket.sendObj({
         route: "disconnect",
-        data: { id: this.$store.getters.getUser("meetingID") }
+        data: { id: this.$store.getters.getUser("meetingID") },
       });
       this.$socket.close();
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -136,5 +136,6 @@ export default {
 /* Styles for Meet */
 .pHsCke {
   padding-left: 270px !important;
+  box-sizing: border-box;
 }
 </style>

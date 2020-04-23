@@ -5,15 +5,18 @@
     <Reaction emoji="confused" text="Hmmm?" label="Send confused face emoji" />
     <Reaction emoji="love" text="Wow" label="Send excited face emoji" />
     <Reaction emoji="laugh" text="LOL!" label="Send laughing emoji" />
+    <WantMore />
   </div>
 </template>
 
 <script>
 import Reaction from "./Reaction";
+import WantMore from "./WantMore";
 export default {
   components: {
-    Reaction
-  }
+    Reaction,
+    WantMore,
+  },
 };
 </script>
 

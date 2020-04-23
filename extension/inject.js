@@ -19,7 +19,7 @@ const injectScript = (file_path, type = "script", tag = "html") => {
 (async () => {
   // Wait until in call
   while (document.querySelector(".d7iDfe") !== null) {
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, 500));
   }
 
   // Create wrapper for Vue App
@@ -28,6 +28,7 @@ const injectScript = (file_path, type = "script", tag = "html") => {
   document.body.prepend(app);
 
   // Inject script into page
+  injectScript("//m.servedby-buysellads.com/monetization.js", "script", "head");
   injectScript("https://www.googletagmanager.com/gtag/js?id=UA-162154532-1", "script", "head");
   injectScript(chrome.runtime.getURL("dist/app.css"), "link", "head");
   injectScript(chrome.runtime.getURL("dist/app.js"), "script", "html");
