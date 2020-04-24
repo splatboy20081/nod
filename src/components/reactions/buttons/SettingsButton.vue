@@ -20,7 +20,7 @@ import SettingsDropdown from "../../settings/SettingsDropdown";
 
 export default {
   components: {
-    SettingsDropdown
+    SettingsDropdown,
   },
   methods: {
     toggleDropdown() {
@@ -32,8 +32,8 @@ export default {
     },
     closeDropdown() {
       this.$store.dispatch("closeDropdown", "settings");
-    }
-  }
+    },
+  },
 };
 </script>
 

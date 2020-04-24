@@ -13,12 +13,12 @@ import ReactionsDropdown from "../ReactionsDropdown";
 
 export default {
   components: {
-    ReactionsDropdown
+    ReactionsDropdown,
   },
   computed: {
     getThumb() {
       return `chrome-extension://${this.$store.state.extensionID}/img/tones/${this.$store.state.tone}/thumb.gif`;
-    }
+    },
   },
   methods: {
     openReactions: function() {
@@ -26,8 +26,8 @@ export default {
     },
     closeReactions: function() {
       this.$store.dispatch("closeDropdown", "reactions");
-    }
-  }
+    },
+  },
 };
 </script>
 
