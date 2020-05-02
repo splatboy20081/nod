@@ -21,17 +21,17 @@ export default {
     },
     getCloseButton() {
       return `chrome-extension://${this.$store.state.extensionID}/img/down.png`;
-    }
+    },
   },
   props: {
     username: String,
     img: String,
     messageId: String,
-    tone: Number
+    tone: Number,
   },
   data() {
     return {
-      hover: false
+      hover: false,
     };
   },
   methods: {
@@ -45,15 +45,12 @@ export default {
       // Remove local copy from store
       this.$store.dispatch("removeHand", key);
       // Send one over the websocket to other users
-      this.$socket.sendObj({
-        action: "REMOVE",
-        message: {
-          id: this.$store.getters.getUser("meetingID"),
-          messageId: key
-        }
+      this.$socket.emit("remove", {
+        id: this.$store.getters.getUser("meetingID"),
+        messageId: key,
       });
-    }
-  }
+    },
+  },
 };
 </script>
 

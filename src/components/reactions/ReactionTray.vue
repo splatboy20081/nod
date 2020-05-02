@@ -19,12 +19,12 @@ export default {
   components: {
     HandUpButton,
     ReactionsButton,
-    SettingsButton
+    SettingsButton,
   },
   computed: {
     trayOpen() {
       return this.$store.state.reactions || this.$store.state.settings;
-    }
+    },
   },
 
   created: function() {
@@ -34,7 +34,7 @@ export default {
     } else {
       localStorage.setItem("nod-skinTone", 0);
     }
-  }
+  },
 };
 </script>
 

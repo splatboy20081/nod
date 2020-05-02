@@ -15,7 +15,7 @@ import { generateUUID, sendNotification } from "../../utils";
 export default {
   components: {
     Message,
-    Hand
+    Hand,
   },
   computed: {
     messages() {
@@ -23,51 +23,48 @@ export default {
     },
     hands() {
       return this.$store.state.hands;
-    }
+    },
   },
   created: function() {
-    this.$options.sockets.onmessage = ({ data }) => {
-      const d = JSON.parse(data);
-      switch (d.action) {
-        case "MESSAGE":
-          this.$store.dispatch("addMessage", {
-            messageId: d.message.messageId || generateUUID(),
-            emoji: d.message.emoji,
-            username: d.message.username,
-            img: d.message.img,
-            owner: false,
-            tone: d.message.tone
-          });
-          break;
-        case "QUEUE":
-          this.$store.dispatch("addHand", {
-            messageId: d.message.messageId,
-            username: d.message.username,
-            img: d.message.img,
-            owner: false,
-            tone: d.message.tone
-          });
+    this.sockets.subscribe("message", (data) => {
+      this.$store.dispatch("addMessage", {
+        messageId: data.messageId || generateUUID(),
+        emoji: data.emoji,
+        username: data.username,
+        img: data.img,
+        owner: false,
+        tone: data.tone,
+      });
+    });
 
-          if (this.$store.state.visible == false && localStorage.getItem("notificationStatus") == "true") {
-            chrome.runtime.sendMessage(this.$store.state.extensionID, {
-              type: "displayNotification",
-              options: {
-                title: "Notification from Nod",
-                message: d.message.username,
-                iconUrl: d.message.tone
-                  ? `chrome-extension://${this.$store.state.extensionID}/img/tones/${d.message.tone}/hand.gif`
-                  : `chrome-extension://${this.$store.state.extensionID}/img/tones/0/hand.gif`,
-                type: "basic"
-              }
-            });
-          }
-          break;
-        case "REMOVE":
-          this.$store.dispatch("removeHand", d.message.messageId);
-          break;
+    this.sockets.subscribe("queue", (data) => {
+      this.$store.dispatch("addHand", {
+        messageId: data.messageId,
+        username: data.username,
+        img: data.img,
+        owner: false,
+        tone: data.tone,
+      });
+
+      if (this.$store.state.visible == false && localStorage.getItem("notificationStatus") == "true") {
+        chrome.runtime.sendMessage(this.$store.state.extensionID, {
+          type: "displayNotification",
+          options: {
+            title: "Notification from Nod",
+            message: data.username,
+            iconUrl: data.tone
+              ? `chrome-extension://${this.$store.state.extensionID}/img/tones/${data.tone}/hand.gif`
+              : `chrome-extension://${this.$store.state.extensionID}/img/tones/0/hand.gif`,
+            type: "basic",
+          },
+        });
       }
-    };
-  }
+    });
+
+    this.sockets.subscribe("remove", ({ messageId }) => {
+      this.$store.dispatch("removeHand", messageId);
+    });
+  },
 };
 </script>
 

@@ -44,16 +44,14 @@ export default {
           tone: this.$store.state.tone,
         });
 
-        this.$socket.sendObj({
-          action: "MESSAGE",
-          message: {
-            id: this.$store.getters.getUser("meetingID"),
-            emoji: emoji,
-            username: this.getUsername,
-            img: this.$store.getters.getUser("avatar"),
-            tone: this.$store.state.tone,
-          },
+        this.$socket.emit("message", {
+          id: this.$store.getters.getUser("meetingID"),
+          emoji: emoji,
+          username: this.getUsername,
+          img: this.$store.getters.getUser("avatar"),
+          tone: this.$store.state.tone,
         });
+
         this.$gtag.event("click", {
           event_category: "Reactions",
           event_label: emoji,

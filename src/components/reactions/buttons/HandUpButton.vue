@@ -21,7 +21,7 @@ export default {
       } else {
         return this.$store.getters.getUser("name");
       }
-    }
+    },
   },
   methods: {
     sendHand() {
@@ -30,39 +30,36 @@ export default {
       //Generate id
       const id = generateUUID();
       // Send local version to store
-      if (this.$store.state.hands.filter(h => h.owner === true).length < 1) {
+      if (this.$store.state.hands.filter((h) => h.owner === true).length < 1) {
         this.$store.dispatch("addHand", {
           emoji: "hand",
           username: `${this.getUsername} raised their hand`,
           img: this.$store.getters.getUser("avatar"),
           messageId: id,
           owner: true,
-          tone: this.$store.state.tone
+          tone: this.$store.state.tone,
         });
         // Send one over the websocket to other users
-        this.$socket.sendObj({
-          action: "QUEUE",
-          message: {
-            id: this.$store.getters.getUser("meetingID"),
-            emoji: "hand",
-            username: `${this.getUsername} raised their hand`,
-            img: this.$store.getters.getUser("avatar"),
-            messageId: id,
-            tone: this.$store.state.tone
-          }
+        this.$socket.emit("queue", {
+          id: this.$store.getters.getUser("meetingID"),
+          emoji: "hand",
+          username: `${this.getUsername} raised their hand`,
+          img: this.$store.getters.getUser("avatar"),
+          messageId: id,
+          tone: this.$store.state.tone,
         });
 
         this.$gtag.event("click", {
           event_category: "Reactions",
           event_label: "Hand Up",
-          event_value: this.$store.state.tone
+          event_value: this.$store.state.tone,
         });
       }
     },
     closeDropdown() {
       this.$store.dispatch("closeDropdown", "reactions");
-    }
-  }
+    },
+  },
 };
 </script>
 

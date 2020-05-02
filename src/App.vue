@@ -8,7 +8,7 @@
 <script>
 import ReactionTray from "./components/reactions/ReactionTray.vue";
 import MessageWrapper from "./components/messages/MessageWrapper.vue";
-import { contains, waitForElement } from "./utils";
+import { contains } from "./utils";
 
 export default {
   name: "App",
@@ -21,12 +21,16 @@ export default {
     ReactionTray,
     MessageWrapper,
   },
-  created: function() {
-    this.getData();
-    this.$options.sockets.onopen = (data) => {
+
+  sockets: {
+    connect: function() {
       this.websocketInit();
       this.setupListeners();
-    };
+    },
+  },
+
+  created: function() {
+    this.getData();
   },
 
   methods: {
@@ -48,30 +52,18 @@ export default {
         this.$store.dispatch("setFullName", localFullName);
       }
     },
+
     websocketInit() {
       // Display extension
       this.loaded = true;
 
       // send join message to websocket
-      this.$socket.sendObj({
-        route: "join",
-        data: {
-          id: this.$store.getters.getUser("meetingID"),
-          team: this.$store.getters.getUser("team"),
-        },
+      this.$socket.emit("join", {
+        id: this.$store.getters.getUser("meetingID"),
       });
 
       // Send console message
       console.log("%c Initialised Nod Extension.", "background: #4D2F3C; color: #FBE2A0");
-      console.log("%c Something gone wrong? Let me know - hi@jamiec.io", "background: #4D2F3C; color: #FBE2A0");
-
-      // Send ping to keep socket connection open
-      const ping = () => {
-        console.log("Keeping Nod alive...");
-        this.$socket.sendObj({ route: "ping" });
-      };
-
-      let keepAlive = setInterval(ping, 60000 * 9);
     },
 
     setupListeners() {
@@ -103,9 +95,8 @@ export default {
 
     async setupDestroyListener() {
       window.addEventListener("beforeunload", (event) => {
-        this.$socket.sendObj({
-          route: "disconnect",
-          data: { id: this.$store.getters.getUser("meetingID") },
+        this.$socket.emit("leave", {
+          id: this.$store.getters.getUser("meetingID"),
         });
       });
 
@@ -114,9 +105,8 @@ export default {
         await new Promise((r) => setTimeout(r, 200));
       }
       this.loaded = false;
-      this.$socket.sendObj({
-        route: "disconnect",
-        data: { id: this.$store.getters.getUser("meetingID") },
+      this.$socket.emit("leave", {
+        id: this.$store.getters.getUser("meetingID"),
       });
       this.$socket.close();
     },

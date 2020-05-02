@@ -48,7 +48,7 @@ export default {
   display: flex;
   padding: 12px 15px;
   border-radius: 6px;
-  box-shadow: 0 1px 4px 1px hsla(0, 0%, 0%, 0.15);
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.4), 0 2px 6px 2px rgba(60, 64, 67, 0.149);
   color: #fff;
   text-transform: uppercase;
   letter-spacing: 0.8px;
@@ -79,7 +79,8 @@ export default {
   padding: 0px 20px;
   border-radius: 6px;
   background: #fff;
-  box-shadow: 0 1px 4px 1px hsla(0, 0%, 0%, 0.15);
+  // box-shadow: 0 1px 4px 1px hsla(0, 0%, 0%, 0.15);
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302), 0 2px 6px 2px rgba(60, 64, 67, 0.149);
   opacity: 0;
   user-select: none;
   transition: transform 0.2s ease-in-out, opacity 0.1s ease-in-out;
